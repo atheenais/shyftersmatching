@@ -54,8 +54,8 @@ python3 -m http.server 8765 --directory .
 |-----|---------|------|
 | 0 | Projet Supabase, tables `profiles` + `rapports`, RLS | ✅ |
 | 1 | Login + liste des rapports (squelette) | ✅ |
-| 2 | Formulaire « Nouveau rapport » + enregistrement | 🔜 |
-| 3 | Détail d'un rapport + recherche / filtres | 🔜 |
+| 2 | Formulaire « Nouveau rapport » + enregistrement | ✅ |
+| 3 | Détail d'un rapport + recherche / filtres | ✅ |
 | 4 | Collage du bloc JSON produit par Claude | 🔜 |
 | 5 | Édition / suppression, rôle admin, export | 🔜 |
 

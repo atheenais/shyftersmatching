@@ -286,6 +286,22 @@ td {
 .score-mid   { background: rgba(245,158,11,.2); color: #FCD34D; }
 .score-low   { background: rgba(239,68,68,.2);  color: #FCA5A5; }
 
+/* ===== FILTER PILLS ===== */
+.filter-pill {
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font);
+  transition: all 0.15s;
+}
+.filter-pill:hover { color: var(--text); border-color: var(--muted); }
+.filter-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
 /* ===== UTILS ===== */
 .text-muted  { color: var(--muted); }
 .text-small  { font-size: 13px; }

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shyfters Matching — Rapport</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .rapport-wrap { max-width: 860px; margin: 0 auto; }
+
+    /* ── Info header ── */
+    .rapport-header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .rapport-identity { flex: 1; min-width: 240px; }
+    .rapport-name  { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .rapport-title { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+    .rapport-meta  { display: flex; flex-wrap: wrap; gap: 16px; }
+    .rapport-meta-item { font-size: 13px; color: var(--muted); }
+    .rapport-meta-item strong { color: var(--text); }
+
+    .rapport-score {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* ── Synthèse ── */
+    .synthese-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 28px;
+      margin-bottom: 20px;
+    }
+    .synthese-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .synthese-text { font-size: 14px; line-height: 1.7; }
+
+    /* ── Matching card container ── */
+    .card-container {
+      margin-bottom: 20px;
+    }
+    .card-container-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    /* ── Matching card (light, standalone) ── */
+    .mc * { box-sizing: border-box; }
+    .mc-sec-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin: 0 0 10px;
+    }
+    .mc-root {
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      overflow: hidden;
+      color: #111827;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    .mc-sep    { border-color: #E5E7EB !important; }
+    .mc-bg2    { background: #F5F4F0; }
+    .mc-t1     { color: #111827; }
+    .mc-t2     { color: #6B7280; }
+    .mc-t3     { color: #9CA3AF; }
+
+    /* ── No-grille ── */
+    .no-grille {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px 24px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .no-grille-icon  { font-size: 36px; margin-bottom: 12px; }
+    .no-grille-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+
+    /* ── Footer ── */
+    .rapport-footer {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: right;
+      padding: 4px 0 24px;
+    }
+
+    @media (max-width: 600px) {
+      .rapport-header { padding: 18px; }
+      .synthese-box   { padding: 16px 18px; }
+      .mc-grid2 { grid-template-columns: 1fr !important; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-icon">⚡</div>
+    <div>
+      <div class="brand-name">Shyfters Matching</div>
+      <div class="brand-sub">CODIR as a Service</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <a href="list.html" class="btn btn-ghost btn-sm">← Retour à la liste</a>
+  </div>
+</header>
+
+<main class="page-inner">
+  <div class="rapport-wrap" id="content">
+    <div class="empty-state">
+      <div class="empty-state-icon">⏳</div>
+      <div class="empty-state-title">Chargement…</div>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script>
+/* ── Constantes visuelles matching card ── */
+const VERDICT_CONFIG = {
+  "fort":      { bg:"#EAF3DE", color:"#3B6D11", icon:"⭐", label:"Match fort"    },
+  "partiel":   { bg:"#FAEEDA", color:"#633806", icon:"⚠️", label:"Match partiel" },
+  "non-match": { bg:"#FCEBEB", color:"#791F1F", icon:"✗",  label:"Non-match"     }
+};
+const ARC_COLORS = {
+  "fort":      "#639922",
+  "partiel":   "#EF9F27",
+  "non-match": "#E24B4A"
+};
+const STATUS_ICON = { valid:"✅", partial:"⚠️", invalid:"❌" };
+
+function esc(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
+function scoreArc(score, verdict) {
+  const r = 32, cx = 40, cy = 40;
+  const circ  = 2 * Math.PI * r;
+  const filled = (score / 100) * circ;
+  const gap    = circ - filled;
+  const color  = ARC_COLORS[verdict] || "#888";
+  return `<svg width="80" height="80" viewBox="0 0 80 80" aria-hidden="true">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#D3D1C7" stroke-width="6"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="6"
+      stroke-dasharray="${filled.toFixed(1)} ${gap.toFixed(1)}" stroke-linecap="round"
+      transform="rotate(-90 ${cx} ${cy})"/>
+    <text x="${cx}" y="44" text-anchor="middle" font-size="20" font-weight="500" fill="#111827">${score}</text>
+    <text x="${cx}" y="55" text-anchor="middle" font-size="10" fill="#6B7280">/100</text>
+  </svg>`;
+}
+
+function useCaseTags(list) {
+  if (!list || !list.length) return `<span style="font-size:12px;color:#9CA3AF;font-style:italic">Aucun use case identifié</span>`;
+  return list
+    .filter(u => u.active || !list.some(x => x.active))
+    .map(u => {
+      const bg    = u.active ? "#E1F5EE" : "#F1EFE8";
+      const color = u.active ? "#0F6E56" : "#5F5E5A";
+      return `<span style="font-size:12px;padding:3px 10px;border-radius:6px;background:${bg};color:${color}">${esc(u.label)}</span>`;
+    }).join("");
+}
+
+function elimRow(c) {
+  return `<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">
+    <span style="font-size:14px;margin-top:1px;flex-shrink:0">${STATUS_ICON[c.status] || '—'}</span>
+    <div style="font-size:13px;line-height:1.4">
+      <span style="font-weight:500;color:#111827">${esc(c.title)}</span><br>
+      <span style="color:#6B7280;font-size:12px">${esc(c.proof)}</span>
+    </div>
+  </div>`;
+}
+
+function roleRow(c) {
+  const note = c.note
+    ? `<span style="margin-left:auto;font-size:11px;color:#6B7280;white-space:nowrap;padding-left:6px">${esc(c.note)}</span>`
+    : "";
+  const labelColor = c.status === "invalid" ? "#6B7280" : "#111827";
+  return `<div style="display:flex;align-items:center;gap:8px;font-size:13px;min-width:0">
+    <span style="flex-shrink:0">${STATUS_ICON[c.status] || '—'}</span>
+    <span style="color:${labelColor};flex:1;min-width:0">${esc(c.label)}</span>${note}
+  </div>`;
+}
+
+function listItem(text, type) {
+  const icon  = type === "strength" ? "✓" : "✗";
+  const color = type === "strength" ? "#1D9E75" : "#D85A30";
+  return `<div style="display:flex;align-items:flex-start;gap:7px;font-size:13px;color:#111827;margin-bottom:8px">
+    <span style="font-size:14px;color:${color};margin-top:1px;flex-shrink:0;font-weight:700">${icon}</span>
+    ${esc(text)}
+  </div>`;
+}
+
+function renderCard(d) {
+  const vc = VERDICT_CONFIG[d.verdict] || VERDICT_CONFIG["non-match"];
+  const score = d.score ?? 0;
+
+  return `<div class="mc mc-root">
+
+    <!-- Header identité + score -->
+    <div style="padding:1.25rem 1.5rem;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:52px;height:52px;border-radius:50%;background:#EEEDFE;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:15px;color:#3C3489;flex-shrink:0">${esc(d.initials)}</div>
+        <div>
+          <p style="font-weight:500;font-size:17px;margin:0;color:#111827">${esc(d.name)}</p>
+          <p style="font-size:13px;color:#6B7280;margin:3px 0 0">${esc(d.title)}</p>
+          <p style="font-size:12px;color:#9CA3AF;margin:2px 0 0">${esc(d.employer)} · ${esc(d.experience)}</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0">
+        ${scoreArc(score, d.verdict)}
+        <span style="font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;background:${vc.bg};color:${vc.color};white-space:nowrap">${vc.icon} ${vc.label}</span>
+      </div>
+    </div>
+
+    <!-- Rôle + use cases -->
+    <div style="padding:.875rem 1.5rem;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:7px">
+        <span style="font-size:15px;color:#6B7280">💼</span>
+        <span style="font-size:13px;color:#6B7280">Rôle cible</span>
+        <span style="font-size:13px;font-weight:500;color:#111827">${esc(d.role)}</span>
+      </div>
+      <span style="color:#D1D5DB">·</span>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <span style="font-size:13px;color:#6B7280">Use cases</span>
+        ${useCaseTags(d.useCases)}
+      </div>
+    </div>
+
+    <!-- Critères éliminatoires + rôle -->
+    <div class="mc-grid2" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-bottom:1px solid #E5E7EB">
+      <div style="padding:1rem 1.5rem;border-right:1px solid #E5E7EB">
+        <p class="mc-sec-label" style="color:#6B7280">Critères éliminatoires</p>
+        ${(d.eliminatoires || []).map(elimRow).join("")}
+      </div>
+      <div style="padding:1rem 1.5rem">
+        <p class="mc-sec-label" style="color:#6B7280">Critères rôle — ${esc(d.roleLabel)}</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${(d.roleCriteria || []).map(roleRow).join("")}
+        </div>
+      </div>
+    </div>
+
+    <!-- Points forts & Gaps -->
+    <div class="mc-grid2" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-bottom:1px solid #E5E7EB">
+      <div style="padding:1rem 1.5rem;border-right:1px solid #E5E7EB">
+        <p class="mc-sec-label" style="color:#0F6E56">Points forts</p>
+        ${(d.strengths || []).map(s => listItem(s, "strength")).join("")}
+      </div>
+      <div style="padding:1rem 1.5rem">
+        <p class="mc-sec-label" style="color:#993C1D">Gaps</p>
+        ${(d.gaps || []).map(g => listItem(g, "gap")).join("")}
+      </div>
+    </div>
+
+    <!-- Recommandation -->
+    <div style="padding:1rem 1.5rem;display:flex;align-items:flex-start;gap:12px;background:#F5F4F0">
+      <span style="font-size:20px;color:#6B7280;margin-top:1px;flex-shrink:0">📋</span>
+      <div>
+        <span style="font-size:13px;font-weight:500;color:#111827">Recommandation : ${esc(d.recommendation)}</span>
+        <p style="font-size:12px;color:#6B7280;margin:3px 0 0;line-height:1.5">${esc(d.recommendationDetail)}</p>
+      </div>
+    </div>
+
+    <!-- Pied de carte -->
+    <div style="padding:.75rem 1.5rem;border-top:1px solid #E5E7EB;display:flex;align-items:center;gap:7px">
+      <span style="font-size:14px;color:#9CA3AF">📄</span>
+      <span style="font-size:12px;color:#9CA3AF">${esc(d.analysisFilename)}</span>
+    </div>
+
+  </div>`;
+}
+
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+
+function badgeClass(r) {
+  if (r === 'fort')    return 'badge-fort';
+  if (r === 'partiel') return 'badge-partiel';
+  return 'badge-non';
+}
+function badgeLabel(r) {
+  if (r === 'fort')    return 'Fort match';
+  if (r === 'partiel') return 'Partiel';
+  return 'Non-match';
+}
+function scoreClass(s) {
+  if (s >= 70) return 'score-high';
+  if (s >= 45) return 'score-mid';
+  return 'score-low';
+}
+
+(async () => {
+  const session = await requireAuth();
+  if (!session) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  const content = document.getElementById('content');
+
+  if (!id) {
+    content.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-title">Rapport introuvable</div><p class="text-muted text-small mt-8">Aucun identifiant fourni.</p></div>`;
+    return;
+  }
+
+  const { data: r, error } = await sb
+    .from('rapports')
+    .select('*, profiles(nom)')
+    .eq('id', id)
+    .single();
+
+  if (error || !r) {
+    content.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-title">Rapport introuvable</div><p class="text-muted text-small mt-8">Ce rapport n'existe pas ou vous n'y avez pas accès.</p></div>`;
+    return;
+  }
+
+  // Titre de la page
+  document.title = `Shyfters Matching — ${r.candidat_nom}`;
+
+  const d = r.detail_grille;
+
+  content.innerHTML = `
+    <!-- Header rapport -->
+    <div class="rapport-header">
+      <div class="rapport-identity">
+        <div class="rapport-name">${esc(r.candidat_nom)}</div>
+        ${r.poste_actuel ? `<div class="rapport-title">${esc(r.poste_actuel)}</div>` : ''}
+        <div class="rapport-meta">
+          <div class="rapport-meta-item">Rôle visé · <strong>${esc(r.poste_vise)}</strong></div>
+          ${r.client ? `<div class="rapport-meta-item">Client · <strong>${esc(r.client)}</strong></div>` : ''}
+          <div class="rapport-meta-item">Ajouté le · <strong>${fmtDate(r.created_at)}</strong></div>
+          <div class="rapport-meta-item">Par · <strong>${esc(r.profiles?.nom || '—')}</strong></div>
+        </div>
+      </div>
+      <div class="rapport-score">
+        <span class="score-pill ${scoreClass(r.score_global)}" style="width:52px;height:52px;border-radius:50%;font-size:18px">
+          ${r.score_global}
+        </span>
+        <span class="badge ${badgeClass(r.recommandation)}">${badgeLabel(r.recommandation)}</span>
+      </div>
+    </div>
+
+    <!-- Synthèse -->
+    ${r.synthese ? `
+    <div class="synthese-box">
+      <div class="synthese-label">Synthèse</div>
+      <div class="synthese-text">${esc(r.synthese)}</div>
+    </div>` : ''}
+
+    <!-- Grille détaillée -->
+    <div class="card-container">
+      <div class="card-container-label">Grille de matching</div>
+      ${d ? renderCard(d) : `
+        <div class="no-grille">
+          <div class="no-grille-icon">📋</div>
+          <div class="no-grille-title">Grille non disponible</div>
+          <p class="text-small mt-8">Aucun bloc JSON n'a été enregistré pour ce rapport.</p>
+        </div>
+      `}
+    </div>
+
+    <div class="rapport-footer">Shyfters Matching Tool · ${esc(r.analysis_filename || '')}</div>
+  `;
+})();
+</script>
+
+</body>
+</html>

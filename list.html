@@ -38,6 +38,28 @@
     </button>
   </div>
 
+  <!-- Filtres -->
+  <div id="filtersBar" hidden style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:16px">
+    <input type="text" id="searchInput" placeholder="Rechercher un candidat, un client…"
+      style="flex:1;min-width:200px;max-width:320px">
+    <div style="display:flex;gap:6px;flex-wrap:wrap" id="recFilters">
+      <button class="filter-pill active" data-rec="">Tous</button>
+      <button class="filter-pill" data-rec="fort">Fort match</button>
+      <button class="filter-pill" data-rec="partiel">Partiel</button>
+      <button class="filter-pill" data-rec="non-match">Non-match</button>
+    </div>
+    <select id="roleFilter" style="max-width:220px">
+      <option value="">Tous les rôles</option>
+      <option>Directeur Général</option>
+      <option>Directeur Marketing Digital</option>
+      <option>Directeur Commercial</option>
+      <option>Directeur Value Chain</option>
+      <option>Directeur Finance et Juridique</option>
+      <option>Directeur Ressources Humaines</option>
+      <option>Directeur Systèmes d'Information</option>
+    </select>
+  </div>
+
   <!-- Tableau (caché si vide) -->
   <div class="table-wrap" id="tableWrap" hidden>
     <table>
@@ -76,27 +98,23 @@
   const session = await requireAuth();
   if (!session) return;
 
-  // Afficher l'email de l'utilisateur connecté
   document.getElementById('userEmail').textContent = session.user.email;
-
-  // Déconnexion
   document.getElementById('logoutBtn').addEventListener('click', signOut);
+  document.getElementById('newBtn').addEventListener('click', () => { window.location.href = 'new.html'; });
 
-  // Bouton nouveau rapport (lot 2)
-  document.getElementById('newBtn').addEventListener('click', () => {
-    window.location.href = 'new.html';
-  });
+  const meta        = document.getElementById('listMeta');
+  const tableWrap   = document.getElementById('tableWrap');
+  const emptyState  = document.getElementById('emptyState');
+  const filtersBar  = document.getElementById('filtersBar');
+  const tbody       = document.getElementById('tableBody');
+  const searchInput = document.getElementById('searchInput');
+  const roleFilter  = document.getElementById('roleFilter');
 
   // Charger les rapports
   const { data: rapports, error } = await sb
     .from('rapports')
     .select('id, candidat_nom, poste_vise, client, score_global, recommandation, created_at, profiles(nom)')
     .order('created_at', { ascending: false });
-
-  const meta      = document.getElementById('listMeta');
-  const tableWrap = document.getElementById('tableWrap');
-  const emptyState = document.getElementById('emptyState');
-  const tbody     = document.getElementById('tableBody');
 
   if (error) {
     meta.textContent = 'Erreur lors du chargement des rapports.';
@@ -111,56 +129,83 @@
     return;
   }
 
-  meta.textContent = `${rapports.length} rapport${rapports.length > 1 ? 's' : ''}`;
-  tableWrap.hidden = false;
-
-  function scoreClass(s) {
-    if (s >= 70) return 'score-high';
-    if (s >= 45) return 'score-mid';
-    return 'score-low';
-  }
-
-  function badgeClass(r) {
-    if (r === 'fort')    return 'badge-fort';
-    if (r === 'partiel') return 'badge-partiel';
-    return 'badge-non';
-  }
-
-  function badgeLabel(r) {
-    if (r === 'fort')    return 'Fort match';
-    if (r === 'partiel') return 'Partiel';
-    return 'Non-match';
-  }
-
-  function fmtDate(iso) {
-    return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
-  }
-
+  // Helpers
   function esc(str) {
     if (!str) return '—';
     return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function scoreClass(s) { return s >= 70 ? 'score-high' : s >= 45 ? 'score-mid' : 'score-low'; }
+  function badgeClass(r) { return r === 'fort' ? 'badge-fort' : r === 'partiel' ? 'badge-partiel' : 'badge-non'; }
+  function badgeLabel(r) { return r === 'fort' ? 'Fort match' : r === 'partiel' ? 'Partiel' : 'Non-match'; }
+  function fmtDate(iso)  { return new Date(iso).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' }); }
+
+  // État des filtres
+  let activeRec  = '';
+  let activeRole = '';
+  let searchTerm = '';
+
+  function applyFilters() {
+    const term = searchTerm.toLowerCase();
+    const filtered = rapports.filter(r => {
+      const matchSearch = !term ||
+        (r.candidat_nom || '').toLowerCase().includes(term) ||
+        (r.client       || '').toLowerCase().includes(term);
+      const matchRec  = !activeRec  || r.recommandation === activeRec;
+      const matchRole = !activeRole || r.poste_vise === activeRole;
+      return matchSearch && matchRec && matchRole;
+    });
+
+    tbody.innerHTML = '';
+
+    if (filtered.length === 0) {
+      tableWrap.hidden = true;
+      emptyState.hidden = false;
+      document.querySelector('.empty-state-title').textContent = 'Aucun résultat';
+      document.querySelector('.empty-state p').textContent = 'Modifiez vos filtres pour voir des rapports.';
+      meta.textContent = '0 résultat';
+      return;
+    }
+
+    emptyState.hidden = true;
+    tableWrap.hidden  = false;
+    meta.textContent  = `${filtered.length} rapport${filtered.length > 1 ? 's' : ''}${filtered.length < rapports.length ? ` (sur ${rapports.length})` : ''}`;
+
+    filtered.forEach(r => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${esc(r.candidat_nom)}</strong></td>
+        <td class="text-muted">${esc(r.poste_vise)}</td>
+        <td class="text-muted">${esc(r.client)}</td>
+        <td><span class="score-pill ${scoreClass(r.score_global)}">${r.score_global}</span></td>
+        <td><span class="badge ${badgeClass(r.recommandation)}">${badgeLabel(r.recommandation)}</span></td>
+        <td class="text-muted">${fmtDate(r.created_at)}</td>
+        <td class="text-muted">${esc(r.profiles?.nom)}</td>
+      `;
+      tr.addEventListener('click', () => { window.location.href = `rapport.html?id=${r.id}`; });
+      tbody.appendChild(tr);
+    });
   }
 
-  rapports.forEach(r => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><strong>${esc(r.candidat_nom)}</strong></td>
-      <td class="text-muted">${esc(r.poste_vise)}</td>
-      <td class="text-muted">${esc(r.client)}</td>
-      <td><span class="score-pill ${scoreClass(r.score_global)}">${r.score_global}</span></td>
-      <td><span class="badge ${badgeClass(r.recommandation)}">${badgeLabel(r.recommandation)}</span></td>
-      <td class="text-muted">${fmtDate(r.created_at)}</td>
-      <td class="text-muted">${esc(r.profiles?.nom)}</td>
-    `;
-    tr.addEventListener('click', () => {
-      window.location.href = `rapport.html?id=${r.id}`;
+  // Affichage initial
+  meta.textContent = `${rapports.length} rapport${rapports.length > 1 ? 's' : ''}`;
+  tableWrap.hidden = false;
+  filtersBar.hidden = false;
+  filtersBar.style.display = 'flex';
+  applyFilters();
+
+  // Événements filtres
+  searchInput.addEventListener('input', () => { searchTerm = searchInput.value; applyFilters(); });
+  roleFilter.addEventListener('change',  () => { activeRole = roleFilter.value;  applyFilters(); });
+
+  document.querySelectorAll('.filter-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeRec = btn.dataset.rec;
+      applyFilters();
     });
-    tbody.appendChild(tr);
   });
 })();
 </script>
