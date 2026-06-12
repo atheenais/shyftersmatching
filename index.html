@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shyfters Matching — Connexion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .login-wrap { width: 100%; max-width: 380px; }
+    .login-tagline {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-center">
+  <div class="login-wrap">
+
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <div>
+        <div class="brand-name">Shyfters Matching</div>
+        <div class="brand-sub">CODIR as a Service</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="login-tagline">Outil interne — accès réservé à l'équipe Shyfters.</p>
+
+      <div id="alert" class="alert alert-error"></div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">Adresse e-mail</label>
+          <input type="email" id="email" placeholder="prenom@shyfters.com" autocomplete="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="submitBtn">
+          Se connecter
+        </button>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script>
+(async () => {
+  // Si déjà connecté → aller directement à la liste
+  const session = await getSession();
+  if (session) {
+    window.location.href = 'list.html';
+    return;
+  }
+
+  const form      = document.getElementById('loginForm');
+  const alertBox  = document.getElementById('alert');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function showError(msg) {
+    alertBox.textContent = msg;
+    alertBox.className = 'alert alert-error show';
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    alertBox.className = 'alert';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Connexion…';
+
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      showError('Identifiants incorrects. Vérifiez votre e-mail et mot de passe.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Se connecter';
+      return;
+    }
+
+    window.location.href = 'list.html';
+  });
+})();
+</script>
+
+</body>
+</html>

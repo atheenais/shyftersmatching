@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shyfters Matching — Rapports</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Barre de navigation -->
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-icon">⚡</div>
+    <div>
+      <div class="brand-name">Shyfters Matching</div>
+      <div class="brand-sub">CODIR as a Service</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="user-badge" id="userEmail">—</span>
+    <button class="btn btn-ghost btn-sm" id="logoutBtn">Déconnexion</button>
+  </div>
+</header>
+
+<!-- Contenu principal -->
+<main class="page-inner">
+
+  <div class="list-header">
+    <div>
+      <div class="list-title">Rapports de matching</div>
+      <div class="list-meta" id="listMeta">Chargement…</div>
+    </div>
+    <button class="btn btn-primary btn-sm" id="newBtn" style="width:auto">
+      + Nouveau rapport
+    </button>
+  </div>
+
+  <!-- Tableau (caché si vide) -->
+  <div class="table-wrap" id="tableWrap" hidden>
+    <table>
+      <thead>
+        <tr>
+          <th>Candidat</th>
+          <th>Poste visé</th>
+          <th>Client</th>
+          <th>Score</th>
+          <th>Recommandation</th>
+          <th>Date</th>
+          <th>Auteur</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- État vide -->
+  <div class="empty-state" id="emptyState" hidden>
+    <div class="empty-state-icon">📋</div>
+    <div class="empty-state-title">Aucun rapport pour l'instant</div>
+    <p class="text-muted text-small mt-8">
+      Analysez un profil dans Claude, puis cliquez sur « Nouveau rapport » pour enregistrer le résultat.
+    </p>
+  </div>
+
+</main>
+
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script>
+(async () => {
+  const session = await requireAuth();
+  if (!session) return;
+
+  // Afficher l'email de l'utilisateur connecté
+  document.getElementById('userEmail').textContent = session.user.email;
+
+  // Déconnexion
+  document.getElementById('logoutBtn').addEventListener('click', signOut);
+
+  // Bouton nouveau rapport (lot 2)
+  document.getElementById('newBtn').addEventListener('click', () => {
+    window.location.href = 'new.html';
+  });
+
+  // Charger les rapports
+  const { data: rapports, error } = await sb
+    .from('rapports')
+    .select('id, candidat_nom, poste_vise, client, score_global, recommandation, created_at, profiles(nom)')
+    .order('created_at', { ascending: false });
+
+  const meta      = document.getElementById('listMeta');
+  const tableWrap = document.getElementById('tableWrap');
+  const emptyState = document.getElementById('emptyState');
+  const tbody     = document.getElementById('tableBody');
+
+  if (error) {
+    meta.textContent = 'Erreur lors du chargement des rapports.';
+    meta.style.color = 'var(--danger)';
+    emptyState.hidden = false;
+    return;
+  }
+
+  if (!rapports || rapports.length === 0) {
+    meta.textContent = '0 rapport';
+    emptyState.hidden = false;
+    return;
+  }
+
+  meta.textContent = `${rapports.length} rapport${rapports.length > 1 ? 's' : ''}`;
+  tableWrap.hidden = false;
+
+  function scoreClass(s) {
+    if (s >= 70) return 'score-high';
+    if (s >= 45) return 'score-mid';
+    return 'score-low';
+  }
+
+  function badgeClass(r) {
+    if (r === 'fort')    return 'badge-fort';
+    if (r === 'partiel') return 'badge-partiel';
+    return 'badge-non';
+  }
+
+  function badgeLabel(r) {
+    if (r === 'fort')    return 'Fort match';
+    if (r === 'partiel') return 'Partiel';
+    return 'Non-match';
+  }
+
+  function fmtDate(iso) {
+    return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  rapports.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${r.candidat_nom}</strong></td>
+      <td class="text-muted">${r.poste_vise || '—'}</td>
+      <td class="text-muted">${r.client || '—'}</td>
+      <td><span class="score-pill ${scoreClass(r.score_global)}">${r.score_global}</span></td>
+      <td><span class="badge ${badgeClass(r.recommandation)}">${badgeLabel(r.recommandation)}</span></td>
+      <td class="text-muted">${fmtDate(r.created_at)}</td>
+      <td class="text-muted">${r.profiles?.nom || '—'}</td>
+    `;
+    tr.addEventListener('click', () => {
+      window.location.href = `rapport.html?id=${r.id}`;
+    });
+    tbody.appendChild(tr);
+  });
+})();
+</script>
+
+</body>
+</html>
