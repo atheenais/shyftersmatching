@@ -4,3 +4,7 @@
 
 const SUPABASE_URL  = 'https://zhudtmftodbaandntevn.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpodWR0bWZ0b2RiYWFuZG50ZXZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDU1MzMsImV4cCI6MjA5Njc4MTUzM30.ea8nQ27yiWp6jv3PLa03JgVzlIxP-0ppxQq9cnWPqZo';
+
+// ⚠️ CACHE — bumper avant chaque déploiement (ex. v1 → v2).
+// Ce numéro DOIT correspondre au ?v=X dans les balises <link> et <script> de chaque page HTML.
+const APP_VERSION = 'v1';
