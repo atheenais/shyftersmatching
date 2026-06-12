@@ -30,9 +30,25 @@
       <div class="list-title">Rapports de matching</div>
       <div class="list-meta" id="listMeta">Chargement…</div>
     </div>
-    <button class="btn btn-primary btn-sm" id="newBtn" style="width:auto">
-      + Nouveau rapport
-    </button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" id="syncBtn" style="width:auto;color:var(--accent);border-color:var(--accent)">
+        ↓ Sync GitHub
+      </button>
+      <button class="btn btn-primary btn-sm" id="newBtn" style="width:auto">
+        + Nouveau rapport
+      </button>
+    </div>
+  </div>
+
+  <!-- Panel sync GitHub -->
+  <div id="syncPanel" hidden>
+    <div class="sync-panel">
+      <div class="sync-panel-header">
+        <div class="sync-panel-title">↓ Rapports depuis GitHub</div>
+        <button class="btn btn-ghost btn-sm" id="syncClose">✕</button>
+      </div>
+      <div id="syncContent"></div>
+    </div>
   </div>
 
   <!-- Filtres -->
@@ -283,6 +299,121 @@
       applyFilters();
     });
   });
+
+  // ── Sync GitHub ──
+  const REPO           = 'atheenais59/shyftersmatching';
+  const GH_API         = `https://api.github.com/repos/${REPO}/contents/reports`;
+  const IMPORTED_KEY   = 'shyfters-gh-imported';
+  const ROLES_VALIDES  = [
+    'Directeur Général','Directeur Marketing Digital','Directeur Commercial',
+    'Directeur Value Chain','Directeur Finance et Juridique',
+    'Directeur Ressources Humaines',"Directeur Systèmes d'Information"
+  ];
+
+  const syncPanel   = document.getElementById('syncPanel');
+  const syncContent = document.getElementById('syncContent');
+
+  function getImported() { return new Set(JSON.parse(localStorage.getItem(IMPORTED_KEY) || '[]')); }
+  function markImported(name) {
+    const s = getImported(); s.add(name);
+    localStorage.setItem(IMPORTED_KEY, JSON.stringify([...s]));
+  }
+  function fmtGHName(name) {
+    return name.replace(/^matching_/, '').replace(/\.json$/, '').replace(/_/g, ' ');
+  }
+
+  document.getElementById('syncClose').addEventListener('click', () => { syncPanel.hidden = true; });
+
+  document.getElementById('syncBtn').addEventListener('click', async () => {
+    syncPanel.hidden = false;
+    syncContent.innerHTML = '<div style="padding:14px 16px;color:var(--muted);font-size:13px">Chargement…</div>';
+
+    let files = [];
+    try {
+      const res = await fetch(GH_API);
+      if (res.status === 404) files = [];
+      else if (!res.ok) throw new Error(`GitHub API : ${res.status}`);
+      else files = await res.json();
+    } catch(e) {
+      syncContent.innerHTML = `<div style="padding:14px 16px;color:var(--danger);font-size:13px">Erreur : ${e.message}</div>`;
+      return;
+    }
+
+    const imported = getImported();
+    const newFiles = files.filter(f => f.name.endsWith('.json') && !imported.has(f.name));
+
+    if (newFiles.length === 0) {
+      syncContent.innerHTML = '<div style="padding:14px 16px;color:var(--muted);font-size:13px">✓ Aucun nouveau rapport à importer.</div>';
+      return;
+    }
+
+    syncContent.innerHTML = newFiles.map(f => `
+      <div class="sync-file-row" id="row_${f.name.replace(/[^a-z0-9]/gi,'_')}">
+        <span class="sync-file-name">${esc(fmtGHName(f.name))}</span>
+        <button class="btn btn-primary btn-sm" style="width:auto;flex-shrink:0"
+          data-url="${f.download_url}" data-name="${f.name}">Importer</button>
+      </div>`).join('');
+
+    syncContent.querySelectorAll('button[data-url]').forEach(btn => {
+      btn.addEventListener('click', () => importGHFile(btn.dataset.url, btn.dataset.name, btn));
+    });
+  });
+
+  async function importGHFile(url, name, btn) {
+    btn.disabled = true;
+    btn.textContent = 'Import…';
+
+    let d;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      d = await res.json();
+    } catch(e) {
+      btn.disabled = false; btn.textContent = 'Réessayer';
+      btn.style.cssText += ';background:var(--danger)';
+      return;
+    }
+
+    const recommandation = ['fort','partiel','non-match'].includes(d.verdict) ? d.verdict : 'non-match';
+    const poste_vise     = ROLES_VALIDES.includes(d.role) ? d.role : 'Directeur Général';
+
+    const payload = {
+      candidat_nom:      d.name                  || 'Inconnu',
+      poste_actuel:      d.title                 || null,
+      poste_vise,
+      client:            null,
+      score_global:      typeof d.score === 'number' ? d.score : 0,
+      recommandation,
+      synthese:          d.recommendationDetail  || '',
+      analysis_filename: name,
+      detail_grille:     d,
+      auteur_id:         session.user.id,
+    };
+
+    const { data: inserted, error } = await sb.from('rapports').insert([payload]).select().single();
+
+    if (error) {
+      btn.disabled = false; btn.textContent = 'Erreur — réessayer';
+      btn.style.cssText += ';background:var(--danger)';
+      return;
+    }
+
+    markImported(name);
+
+    // Mise à jour visuelle de la ligne
+    const row = document.getElementById('row_' + name.replace(/[^a-z0-9]/gi,'_'));
+    row.innerHTML = `
+      <span class="sync-file-name">${esc(fmtGHName(name))}</span>
+      <a href="rapport.html?id=${inserted.id}" class="btn btn-ghost btn-sm"
+        style="flex-shrink:0;color:var(--success);border-color:var(--success)">✓ Voir le rapport →</a>`;
+
+    // Ajout du rapport dans la liste locale sans recharger
+    rapports.unshift(inserted);
+    meta.textContent = `${rapports.length} rapport${rapports.length > 1 ? 's' : ''}`;
+    tableWrap.hidden = false;
+    emptyState.hidden = true;
+    applyFilters();
+  }
 })();
 </script>
 

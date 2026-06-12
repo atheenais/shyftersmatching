@@ -305,6 +305,42 @@ td {
 .filter-pill:hover { color: var(--text); border-color: var(--muted); }
 .filter-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
+/* ===== SYNC GITHUB PANEL ===== */
+.sync-panel {
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.sync-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sync-panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.sync-file-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sync-file-row:last-child { border-bottom: none; }
+.sync-file-name {
+  font-size: 13px;
+  color: var(--text);
+}
+
 /* ===== HIDDEN ATTRIBUTE FIX (display:flex/inline-flex override) ===== */
 [hidden] { display: none !important; }
 
