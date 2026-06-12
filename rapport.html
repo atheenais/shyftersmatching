@@ -137,6 +137,37 @@
       .synthese-box   { padding: 16px 18px; }
       .mc-grid2 { grid-template-columns: 1fr !important; }
     }
+
+    @media print {
+      .topbar, .rapport-actions { display: none !important; }
+      body { background: #fff; color: #111827; }
+      .page-inner { padding: 0; }
+      .rapport-wrap { max-width: 100%; }
+      .rapport-header {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        box-shadow: none;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .synthese-box {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .score-pill, .badge {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .mc-root {
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      a { color: inherit; text-decoration: none; }
+    }
   </style>
 </head>
 <body>
@@ -147,6 +178,7 @@
   </div>
   <div class="topbar-right">
     <a href="list.html" class="btn btn-ghost btn-sm">← Retour à la liste</a>
+    <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨 PDF</button>
   </div>
 </header>
 
