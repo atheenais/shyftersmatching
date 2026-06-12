@@ -136,6 +136,38 @@
   function badgeClass(r) { return r === 'fort' ? 'badge-fort' : r === 'partiel' ? 'badge-partiel' : 'badge-non'; }
   function badgeLabel(r) { return r === 'fort' ? 'Fort match' : r === 'partiel' ? 'Partiel' : 'Non-match'; }
   function fmtDate(iso)  { return new Date(iso).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' }); }
+  function norm(str) {
+    return (str || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
+  function levenshtein(a, b) {
+    const m = a.length, n = b.length;
+    const prev = Array.from({length: n + 1}, (_, j) => j);
+    const curr = new Array(n + 1);
+    for (let i = 1; i <= m; i++) {
+      curr[0] = i;
+      for (let j = 1; j <= n; j++) {
+        curr[j] = a[i-1] === b[j-1]
+          ? prev[j-1]
+          : 1 + Math.min(prev[j], curr[j-1], prev[j-1]);
+      }
+      prev.splice(0, n + 1, ...curr);
+    }
+    return prev[n];
+  }
+
+  function fuzzyMatch(query, target) {
+    if (!query) return true;
+    if (target.includes(query)) return true;
+    if (query.length < 4) return false;
+    const qWords = query.split(/\s+/).filter(Boolean);
+    const tWords = target.split(/\s+/).filter(Boolean);
+    const threshold = w => w.length <= 5 ? 1 : 2;
+    return qWords.every(qw =>
+      target.includes(qw) ||
+      tWords.some(tw => levenshtein(qw, tw) <= threshold(qw))
+    );
+  }
 
   // État des filtres + tri
   let activeRec  = '';
@@ -168,11 +200,10 @@
   }
 
   function applyFilters() {
-    const term = searchTerm.toLowerCase();
+    const term = norm(searchTerm);
     const filtered = rapports.filter(r => {
-      const matchSearch = !term ||
-        (r.candidat_nom || '').toLowerCase().includes(term) ||
-        (r.client       || '').toLowerCase().includes(term);
+      const haystack = norm(r.candidat_nom) + ' ' + norm(r.client || '');
+      const matchSearch = !term || fuzzyMatch(term, haystack);
       const matchRec  = !activeRec  || r.recommandation === activeRec;
       const matchRole = !activeRole || r.poste_vise === activeRole;
       return matchSearch && matchRec && matchRole;
