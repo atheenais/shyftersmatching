@@ -136,16 +136,26 @@
     return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
+  function esc(str) {
+    if (!str) return '—';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   rapports.forEach(r => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><strong>${r.candidat_nom}</strong></td>
-      <td class="text-muted">${r.poste_vise || '—'}</td>
-      <td class="text-muted">${r.client || '—'}</td>
+      <td><strong>${esc(r.candidat_nom)}</strong></td>
+      <td class="text-muted">${esc(r.poste_vise)}</td>
+      <td class="text-muted">${esc(r.client)}</td>
       <td><span class="score-pill ${scoreClass(r.score_global)}">${r.score_global}</span></td>
       <td><span class="badge ${badgeClass(r.recommandation)}">${badgeLabel(r.recommandation)}</span></td>
       <td class="text-muted">${fmtDate(r.created_at)}</td>
-      <td class="text-muted">${r.profiles?.nom || '—'}</td>
+      <td class="text-muted">${esc(r.profiles?.nom)}</td>
     `;
     tr.addEventListener('click', () => {
       window.location.href = `rapport.html?id=${r.id}`;

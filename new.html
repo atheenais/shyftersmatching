@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shyfters Matching — Nouveau rapport</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .form-wrap { max-width: 720px; margin: 0 auto; }
+
+    .form-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+
+    .form-section-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+      .form-section { padding: 20px; }
+    }
+
+    .score-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .json-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    .json-hint code {
+      background: var(--border);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    #jsonTextarea {
+      min-height: 160px;
+      font-family: 'Menlo', 'Monaco', monospace;
+      font-size: 12px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+
+    .btn-cancel {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .btn-cancel:hover { color: var(--text); border-color: var(--muted); }
+
+    .btn-save {
+      background: var(--accent);
+      color: #fff;
+      min-width: 160px;
+    }
+    .btn-save:hover:not(:disabled) { background: var(--accent-h); }
+
+    .rec-options {
+      display: flex;
+      gap: 10px;
+    }
+
+    .rec-option input[type="radio"] { display: none; }
+
+    .rec-option label {
+      display: inline-block;
+      padding: 7px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--muted);
+      transition: all 0.15s;
+    }
+
+    .rec-option input:checked + label { border-color: transparent; }
+    .rec-option.fort    input:checked + label { background: rgba(34,197,94,.2);  color: #86EFAC; }
+    .rec-option.partiel input:checked + label { background: rgba(245,158,11,.2); color: #FCD34D; }
+    .rec-option.non     input:checked + label { background: rgba(239,68,68,.2);  color: #FCA5A5; }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-icon">⚡</div>
+    <div>
+      <div class="brand-name">Shyfters Matching</div>
+      <div class="brand-sub">CODIR as a Service</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <a href="list.html" class="btn btn-ghost btn-sm">← Retour à la liste</a>
+  </div>
+</header>
+
+<main class="page-inner">
+  <div class="form-wrap">
+
+    <div class="list-header" style="margin-bottom:24px">
+      <div>
+        <div class="list-title">Nouveau rapport</div>
+        <div class="list-meta">Enregistrer un matching produit dans Claude</div>
+      </div>
+    </div>
+
+    <div id="alert" class="alert"></div>
+
+    <form id="reportForm">
+
+      <!-- Section 1 : Candidat -->
+      <div class="form-section">
+        <div class="form-section-title">Candidat</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="candidat_nom">Nom complet <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="candidat_nom" placeholder="Prénom Nom" required>
+          </div>
+          <div class="form-group">
+            <label for="poste_actuel">Poste actuel</label>
+            <input type="text" id="poste_actuel" placeholder="ex. DAF chez Acme">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="poste_vise">Rôle CODIR visé <span style="color:var(--danger)">*</span></label>
+            <select id="poste_vise" required>
+              <option value="" disabled selected>Choisir un rôle…</option>
+              <option>Directeur Général</option>
+              <option>Directeur Marketing Digital</option>
+              <option>Directeur Commercial</option>
+              <option>Directeur Value Chain</option>
+              <option>Directeur Finance et Juridique</option>
+              <option>Directeur Ressources Humaines</option>
+              <option>Directeur Systèmes d'Information</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="client">Client (optionnel)</label>
+            <input type="text" id="client" placeholder="Société recherchant le profil">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2 : Résultat du matching -->
+      <div class="form-section">
+        <div class="form-section-title">Résultat du matching</div>
+
+        <div class="form-row" style="align-items:start">
+          <div class="form-group">
+            <label for="score_global">Score global <span style="color:var(--danger)">*</span></label>
+            <input type="number" id="score_global" min="0" max="100" placeholder="0 – 100" required>
+            <div class="score-hint">≥ 70 = fort match · 45–69 = partiel · &lt; 45 = non-match</div>
+          </div>
+          <div class="form-group">
+            <label>Recommandation <span style="color:var(--danger)">*</span></label>
+            <div class="rec-options">
+              <div class="rec-option fort">
+                <input type="radio" name="recommandation" id="rec_fort" value="fort" required>
+                <label for="rec_fort">Fort match</label>
+              </div>
+              <div class="rec-option partiel">
+                <input type="radio" name="recommandation" id="rec_partiel" value="partiel">
+                <label for="rec_partiel">Partiel</label>
+              </div>
+              <div class="rec-option non">
+                <input type="radio" name="recommandation" id="rec_non" value="non-match">
+                <label for="rec_non">Non-match</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="synthese">Synthèse <span style="color:var(--danger)">*</span></label>
+          <textarea id="synthese" placeholder="Justification synthétique du verdict (3-5 lignes)…" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="analysis_filename">Fichier d'analyse (optionnel)</label>
+          <input type="text" id="analysis_filename" placeholder="ex. matching-prenom-nom-2026-06.md">
+        </div>
+      </div>
+
+      <!-- Section 3 : Grille détaillée -->
+      <div class="form-section">
+        <div class="form-section-title">Grille détaillée (JSON)</div>
+
+        <div class="form-group">
+          <label for="jsonTextarea">Bloc JSON produit par Claude (optionnel)</label>
+          <textarea id="jsonTextarea" placeholder='Coller ici l&apos;objet data de la matching card…&#10;{ "initials": "...", "role": "...", ... }'></textarea>
+          <div class="json-hint">
+            Coller l'objet <code>data</code> complet issu de la matching card Claude.
+            Laissez vide si vous ne l'avez pas encore — vous pourrez le compléter plus tard.
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a href="list.html" class="btn btn-cancel">Annuler</a>
+        <button type="submit" class="btn btn-save" id="submitBtn">Enregistrer le rapport</button>
+      </div>
+
+    </form>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script>
+(async () => {
+  const session = await requireAuth();
+  if (!session) return;
+
+  const form      = document.getElementById('reportForm');
+  const alertBox  = document.getElementById('alert');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function showAlert(msg, type = 'error') {
+    alertBox.textContent = msg;
+    alertBox.className = `alert alert-${type} show`;
+    alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    alertBox.className = 'alert';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Enregistrement…';
+
+    // Lecture des champs
+    const candidat_nom      = document.getElementById('candidat_nom').value.trim();
+    const poste_actuel      = document.getElementById('poste_actuel').value.trim();
+    const poste_vise        = document.getElementById('poste_vise').value;
+    const client            = document.getElementById('client').value.trim();
+    const score_global      = parseInt(document.getElementById('score_global').value, 10);
+    const recommandation    = document.querySelector('input[name="recommandation"]:checked')?.value;
+    const synthese          = document.getElementById('synthese').value.trim();
+    const analysis_filename = document.getElementById('analysis_filename').value.trim();
+    const jsonRaw           = document.getElementById('jsonTextarea').value.trim();
+
+    // Validation recommandation (les champs HTML required couvrent le reste)
+    if (!recommandation) {
+      showAlert('Merci de sélectionner une recommandation (Fort match / Partiel / Non-match).');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Enregistrer le rapport';
+      return;
+    }
+
+    // Validation + parsing du JSON si fourni
+    let detail_grille = null;
+    if (jsonRaw) {
+      try {
+        detail_grille = JSON.parse(jsonRaw);
+      } catch {
+        showAlert('Le bloc JSON est invalide. Vérifiez sa syntaxe ou laissez ce champ vide.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Enregistrer le rapport';
+        return;
+      }
+    }
+
+    const payload = {
+      candidat_nom,
+      poste_actuel:      poste_actuel      || null,
+      poste_vise,
+      client:            client            || null,
+      score_global,
+      recommandation,
+      synthese,
+      analysis_filename: analysis_filename || null,
+      detail_grille,
+      auteur_id: session.user.id,
+    };
+
+    const { data, error } = await sb.from('rapports').insert([payload]).select('id').single();
+
+    if (error) {
+      showAlert('Erreur lors de l\'enregistrement : ' + error.message);
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Enregistrer le rapport';
+      return;
+    }
+
+    // Succès → redirection vers la liste
+    window.location.href = 'list.html';
+  });
+})();
+</script>
+
+</body>
+</html>

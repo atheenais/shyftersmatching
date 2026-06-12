@@ -126,6 +126,7 @@ label {
 input[type="email"],
 input[type="password"],
 input[type="text"],
+input[type="number"],
 select,
 textarea {
   width: 100%;
