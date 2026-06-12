@@ -136,6 +136,8 @@
       .rapport-header { padding: 18px; }
       .synthese-box   { padding: 16px 18px; }
       .mc-grid2 { grid-template-columns: 1fr !important; }
+      .mc-root  { overflow: hidden; max-width: 100%; }
+      body, .page-inner { overflow-x: hidden; }
     }
 
     @media print {
@@ -245,7 +247,7 @@ function useCaseTags(list) {
 function elimRow(c) {
   return `<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">
     <span style="font-size:14px;margin-top:1px;flex-shrink:0">${STATUS_ICON[c.status] || '—'}</span>
-    <div style="font-size:13px;line-height:1.4">
+    <div style="font-size:13px;line-height:1.4;min-width:0;overflow-wrap:break-word">
       <span style="font-weight:500;color:#111827">${esc(c.title)}</span><br>
       <span style="color:#6B7280;font-size:12px">${esc(c.proof)}</span>
     </div>
