@@ -23,3 +23,10 @@ async function signOut() {
   await sb.auth.signOut();
   window.location.href = 'index.html';
 }
+
+// Redirige vers le login si la session expire en cours de navigation
+sb.auth.onAuthStateChange((event) => {
+  if (event === 'SIGNED_OUT' && !window.location.pathname.endsWith('index.html')) {
+    window.location.href = 'index.html';
+  }
+});

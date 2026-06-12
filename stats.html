@@ -139,6 +139,11 @@
         <div class="list-title">Tableau de bord</div>
         <div class="list-meta" id="statsMeta">Chargement…</div>
       </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="filter-pill active period-pill" data-period="all">Tout</button>
+        <button class="filter-pill period-pill" data-period="30d">30 jours</button>
+        <button class="filter-pill period-pill" data-period="7d">7 jours</button>
+      </div>
     </div>
 
     <!-- KPIs -->
@@ -191,92 +196,132 @@
 
   const meta = document.getElementById('statsMeta');
 
-  const { data: rapports, error } = await sb
+  const { data: allRapports, error } = await sb
     .from('rapports')
     .select('id, candidat_nom, score_global, recommandation, poste_vise, created_at')
     .order('created_at', { ascending: false });
 
-  if (error || !rapports) {
+  if (error || !allRapports) {
     meta.textContent = 'Erreur de chargement.';
     meta.style.color = 'var(--danger)';
     return;
   }
 
-  if (rapports.length === 0) {
+  if (allRapports.length === 0) {
     meta.textContent = 'Aucun rapport enregistré.';
     return;
   }
 
-  const total = rapports.length;
-  meta.textContent = `Basé sur ${total} rapport${total > 1 ? 's' : ''}`;
-
-  // KPIs
-  const scores  = rapports.map(r => r.score_global).filter(s => s != null);
-  const avgScore = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
-  const fortCount = rapports.filter(r => r.recommandation === 'fort').length;
-  const fortPct   = Math.round((fortCount / total) * 100);
-
-  document.getElementById('kpiTotal').textContent = total;
-  document.getElementById('kpiScore').textContent = avgScore + ' / 100';
-  document.getElementById('kpiFort').textContent  = fortPct + '%';
-  document.getElementById('kpiGrid').hidden = false;
-
-  // Répartition recommandations
-  const recDefs = [
-    { key: 'fort',      label: 'Fort match', cls: 'bar-fort' },
-    { key: 'partiel',   label: 'Partiel',    cls: 'bar-partiel' },
-    { key: 'non-match', label: 'Non-match',  cls: 'bar-non' },
-  ];
-  const recBars = document.getElementById('recBars');
-  recDefs.forEach(({ key, label, cls }) => {
-    const count = rapports.filter(r => r.recommandation === key).length;
-    const pct   = total ? Math.round((count / total) * 100) : 0;
-    recBars.insertAdjacentHTML('beforeend', `
-      <div class="bar-row">
-        <span class="bar-label">${label}</span>
-        <div class="bar-track"><div class="bar-fill ${cls}" style="width:${pct}%"></div></div>
-        <span class="bar-count">${count} <span style="color:var(--muted);font-size:11px">(${pct}%)</span></span>
-      </div>`);
-  });
-  document.getElementById('sectionRec').hidden = false;
-
-  // Répartition par rôle
-  const roleCount = {};
-  rapports.forEach(r => {
-    if (r.poste_vise) roleCount[r.poste_vise] = (roleCount[r.poste_vise] || 0) + 1;
-  });
-  const rolesSorted = Object.entries(roleCount).sort((a, b) => b[1] - a[1]);
-  const maxRole = rolesSorted[0]?.[1] || 1;
-  const roleBars = document.getElementById('roleBars');
-  rolesSorted.forEach(([role, count]) => {
-    const pct = Math.round((count / maxRole) * 100);
-    roleBars.insertAdjacentHTML('beforeend', `
-      <div class="bar-row">
-        <span class="bar-label" title="${role}">${role}</span>
-        <div class="bar-track"><div class="bar-fill bar-role" style="width:${pct}%"></div></div>
-        <span class="bar-count">${count}</span>
-      </div>`);
-  });
-  document.getElementById('sectionRole').hidden = false;
-
-  // Derniers rapports
+  // ── Helpers ──
   function badgeClass(r) { return r === 'fort' ? 'badge-fort' : r === 'partiel' ? 'badge-partiel' : 'badge-non'; }
   function badgeLabel(r) { return r === 'fort' ? 'Fort match' : r === 'partiel' ? 'Partiel' : 'Non-match'; }
-  function fmtDate(iso) { return new Date(iso).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' }); }
-  function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function fmtDate(iso)  { return new Date(iso).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' }); }
+  function esc(s)        { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-  const table = document.getElementById('recentTable');
-  rapports.slice(0, 5).forEach(r => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><strong>${esc(r.candidat_nom)}</strong></td>
-      <td class="text-muted recent-col-role recent-col-pl">${esc(r.poste_vise)}</td>
-      <td class="recent-col-pl"><span class="badge ${badgeClass(r.recommandation)}">${badgeLabel(r.recommandation)}</span></td>
-      <td class="text-muted" style="text-align:right">${fmtDate(r.created_at)}</td>`;
-    tr.addEventListener('click', () => { window.location.href = `rapport.html?id=${r.id}`; });
-    table.appendChild(tr);
+  // ── Filtre période ──
+  let activePeriod = 'all';
+
+  function filterByPeriod(rapports, period) {
+    if (period === 'all') return rapports;
+    const days = period === '7d' ? 7 : 30;
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+    return rapports.filter(r => new Date(r.created_at) >= cutoff);
+  }
+
+  document.querySelectorAll('.period-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.period-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activePeriod = btn.dataset.period;
+      renderStats(filterByPeriod(allRapports, activePeriod));
+    });
   });
-  document.getElementById('sectionRecent').hidden = false;
+
+  // ── Rendu ──
+  function renderStats(rapports) {
+    const total = rapports.length;
+    const sections = ['kpiGrid','sectionRec','sectionRole','sectionRecent'];
+
+    if (total === 0) {
+      meta.textContent = 'Aucun rapport sur cette période.';
+      sections.forEach(id => { document.getElementById(id).hidden = true; });
+      return;
+    }
+
+    const periodLabel = activePeriod === '7d' ? '7 derniers jours'
+                      : activePeriod === '30d' ? '30 derniers jours'
+                      : 'toutes périodes';
+    meta.textContent = `${total} rapport${total > 1 ? 's' : ''} — ${periodLabel}`;
+
+    // KPIs
+    const scores    = rapports.map(r => r.score_global).filter(s => s != null);
+    const avgScore  = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+    const fortCount = rapports.filter(r => r.recommandation === 'fort').length;
+    const fortPct   = Math.round((fortCount / total) * 100);
+
+    document.getElementById('kpiTotal').textContent = total;
+    document.getElementById('kpiScore').textContent = avgScore + ' / 100';
+    document.getElementById('kpiFort').textContent  = fortPct + '%';
+    document.getElementById('kpiGrid').hidden = false;
+
+    // Répartition recommandations
+    const recDefs = [
+      { key: 'fort',      label: 'Fort match', cls: 'bar-fort' },
+      { key: 'partiel',   label: 'Partiel',    cls: 'bar-partiel' },
+      { key: 'non-match', label: 'Non-match',  cls: 'bar-non' },
+    ];
+    const recBars = document.getElementById('recBars');
+    recBars.innerHTML = '';
+    recDefs.forEach(({ key, label, cls }) => {
+      const count = rapports.filter(r => r.recommandation === key).length;
+      const pct   = total ? Math.round((count / total) * 100) : 0;
+      recBars.insertAdjacentHTML('beforeend', `
+        <div class="bar-row">
+          <span class="bar-label">${label}</span>
+          <div class="bar-track"><div class="bar-fill ${cls}" style="width:${pct}%"></div></div>
+          <span class="bar-count">${count} <span style="color:var(--muted);font-size:11px">(${pct}%)</span></span>
+        </div>`);
+    });
+    document.getElementById('sectionRec').hidden = false;
+
+    // Répartition par rôle
+    const roleCount = {};
+    rapports.forEach(r => {
+      if (r.poste_vise) roleCount[r.poste_vise] = (roleCount[r.poste_vise] || 0) + 1;
+    });
+    const rolesSorted = Object.entries(roleCount).sort((a, b) => b[1] - a[1]);
+    const maxRole = rolesSorted[0]?.[1] || 1;
+    const roleBars = document.getElementById('roleBars');
+    roleBars.innerHTML = '';
+    rolesSorted.forEach(([role, count]) => {
+      const pct = Math.round((count / maxRole) * 100);
+      roleBars.insertAdjacentHTML('beforeend', `
+        <div class="bar-row">
+          <span class="bar-label" title="${role}">${role}</span>
+          <div class="bar-track"><div class="bar-fill bar-role" style="width:${pct}%"></div></div>
+          <span class="bar-count">${count}</span>
+        </div>`);
+    });
+    document.getElementById('sectionRole').hidden = false;
+
+    // 5 derniers rapports
+    const table = document.getElementById('recentTable');
+    table.innerHTML = '';
+    rapports.slice(0, 5).forEach(r => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${esc(r.candidat_nom)}</strong></td>
+        <td class="text-muted recent-col-role recent-col-pl">${esc(r.poste_vise)}</td>
+        <td class="recent-col-pl"><span class="badge ${badgeClass(r.recommandation)}">${badgeLabel(r.recommandation)}</span></td>
+        <td class="text-muted" style="text-align:right">${fmtDate(r.created_at)}</td>`;
+      tr.addEventListener('click', () => { window.location.href = `rapport.html?id=${r.id}`; });
+      table.appendChild(tr);
+    });
+    document.getElementById('sectionRecent').hidden = false;
+  }
+
+  renderStats(allRapports);
 })();
 </script>
 
