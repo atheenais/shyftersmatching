@@ -209,7 +209,10 @@
         <div class="form-row" style="align-items:start">
           <div class="form-group">
             <label for="score_global">Score global <span style="color:var(--danger)">*</span></label>
-            <input type="number" id="score_global" min="0" max="100" placeholder="0 – 100" required>
+            <div class="score-slider-wrap">
+              <input type="range" id="score_global" min="0" max="100" value="50" required>
+              <span class="score-badge mid" id="scoreBadge">50</span>
+            </div>
             <div class="score-hint">≥ 70 = fort match · 45–69 = partiel · &lt; 45 = non-match</div>
           </div>
           <div class="form-group">
@@ -278,6 +281,22 @@
   const alertBox  = document.getElementById('alert');
   const submitBtn = document.getElementById('submitBtn');
 
+  // ── Slider de score ──
+  const scoreRange = document.getElementById('score_global');
+  const scoreBadge = document.getElementById('scoreBadge');
+
+  function updateScoreUI(val, autoRadio = false) {
+    val = Math.max(0, Math.min(100, parseInt(val, 10) || 0));
+    scoreRange.value = val;
+    scoreBadge.textContent = val;
+    scoreBadge.className = 'score-badge ' + (val >= 70 ? 'high' : val >= 45 ? 'mid' : 'low');
+    if (autoRadio) {
+      const id = val >= 70 ? 'rec_fort' : val >= 45 ? 'rec_partiel' : 'rec_non';
+      document.getElementById(id).checked = true;
+    }
+  }
+  scoreRange.addEventListener('input', () => updateScoreUI(scoreRange.value, true));
+
   // ── Mode édition ──
   const editId = new URLSearchParams(window.location.search).get('id');
 
@@ -300,7 +319,7 @@
       document.getElementById('candidat_nom').value      = existing.candidat_nom      || '';
       document.getElementById('poste_actuel').value      = existing.poste_actuel      || '';
       document.getElementById('client').value            = existing.client            || '';
-      document.getElementById('score_global').value      = existing.score_global      ?? '';
+      updateScoreUI(existing.score_global ?? 50);
       document.getElementById('synthese').value          = existing.synthese          || '';
       document.getElementById('analysis_filename').value = existing.analysis_filename || '';
 
@@ -350,7 +369,7 @@
     // Remplissage des champs
     if (d.name)             document.getElementById('candidat_nom').value   = d.name;
     if (d.title)            document.getElementById('poste_actuel').value   = d.title;
-    if (d.score != null)    document.getElementById('score_global').value   = d.score;
+    if (d.score != null)    updateScoreUI(d.score, true);
     if (d.recommendationDetail) document.getElementById('synthese').value  = d.recommendationDetail;
     if (d.analysisFilename) document.getElementById('analysis_filename').value = d.analysisFilename;
 

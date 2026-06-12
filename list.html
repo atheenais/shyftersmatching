@@ -31,6 +31,9 @@
       <div class="list-meta" id="listMeta">Chargement…</div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" id="csvBtn" style="width:auto" hidden>
+        ↓ CSV
+      </button>
       <button class="btn btn-ghost btn-sm" id="syncBtn" style="width:auto;color:var(--accent);border-color:var(--accent)">
         ↓ Sync GitHub
       </button>
@@ -102,6 +105,8 @@
 
 </main>
 
+<div class="toast-container" id="toastContainer"></div>
+
 <!-- Supabase CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js?v=1"></script>
@@ -122,6 +127,37 @@
   const tbody       = document.getElementById('tableBody');
   const searchInput = document.getElementById('searchInput');
   const roleFilter  = document.getElementById('roleFilter');
+
+  // ── Toast ──
+  function showToast(msg, type = 'success', duration = 3000) {
+    const container = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast toast-${type}`;
+    t.textContent = msg;
+    container.appendChild(t);
+    setTimeout(() => t.remove(), duration);
+  }
+
+  // ── Export CSV ──
+  function exportCSV() {
+    const cols    = ['candidat_nom','poste_vise','score_global','recommandation','client','created_at'];
+    const headers = ['Nom','Rôle','Score','Recommandation','Client','Date'];
+    const rows = rapports.map(r => cols.map(c => {
+      let v = r[c] ?? '';
+      if (c === 'created_at') v = new Date(v).toLocaleDateString('fr-FR');
+      return `"${String(v).replace(/"/g, '""')}"`;
+    }));
+    const csv  = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+    const a = Object.assign(document.createElement('a'), {
+      href: URL.createObjectURL(blob),
+      download: `shyfters-rapports-${new Date().toISOString().slice(0,10)}.csv`,
+    });
+    a.click();
+    showToast(`${rapports.length} rapport${rapports.length > 1 ? 's' : ''} exporté${rapports.length > 1 ? 's' : ''} en CSV`, 'info');
+  }
+
+  document.getElementById('csvBtn').addEventListener('click', exportCSV);
 
   // Charger les rapports
   const { data: rapports, error } = await sb
@@ -270,6 +306,7 @@
   tableWrap.hidden = false;
   filtersBar.hidden = false;
   filtersBar.style.display = 'flex';
+  document.getElementById('csvBtn').hidden = false;
   applyFilters();
 
   // Événements filtres
@@ -374,7 +411,20 @@
       return;
     }
 
-    const recommandation = ['fort','partiel','non-match'].includes(d.verdict) ? d.verdict : 'non-match';
+    // Validation des champs requis
+    const missing = [];
+    if (!d.name || typeof d.name !== 'string') missing.push('nom');
+    if (typeof d.score !== 'number' || d.score < 0 || d.score > 100) missing.push('score');
+    if (!['fort','partiel','non-match'].includes(d.verdict)) missing.push('verdict');
+    if (missing.length) {
+      btn.disabled = false;
+      btn.textContent = '⚠ JSON invalide';
+      btn.style.cssText += ';background:var(--danger)';
+      btn.title = `Champs manquants ou invalides : ${missing.join(', ')}`;
+      return;
+    }
+
+    const recommandation = d.verdict;
     const poste_vise     = ROLES_VALIDES.includes(d.role) ? d.role : 'Directeur Général';
 
     const payload = {
@@ -399,6 +449,7 @@
     }
 
     markImported(name);
+    showToast(`✓ ${fmtGHName(name)} importé avec succès`, 'success');
 
     // Mise à jour visuelle de la ligne
     const row = document.getElementById('row_' + name.replace(/[^a-z0-9]/gi,'_'));
