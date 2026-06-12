@@ -160,6 +160,10 @@
         <button type="button" class="btn btn-primary btn-sm" id="importBtn" style="width:auto">
           Pré-remplir le formulaire
         </button>
+        <label class="btn btn-ghost btn-sm" style="cursor:pointer;margin:0">
+          📂 Importer un fichier .json
+          <input type="file" id="importFile" accept=".json" style="display:none">
+        </label>
         <span id="importStatus" style="font-size:13px;color:var(--muted)"></span>
       </div>
     </div>
@@ -284,6 +288,19 @@
     'Directeur Value Chain','Directeur Finance et Juridique',
     'Directeur Ressources Humaines','Directeur Systèmes d\'Information'
   ];
+
+  // Lecture de fichier → même logique que le collage
+  document.getElementById('importFile').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      document.getElementById('importJson').value = ev.target.result;
+      document.getElementById('importBtn').click();
+    };
+    reader.readAsText(file);
+    e.target.value = ''; // reset pour permettre de recharger le même fichier
+  });
 
   document.getElementById('importBtn').addEventListener('click', () => {
     const raw    = document.getElementById('importJson').value.trim();
