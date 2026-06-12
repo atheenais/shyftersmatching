@@ -1,0 +1,48 @@
+{
+  "name": "Mélissa Mabire",
+  "initials": "MM",
+  "title": "Présidente & DRH conseil",
+  "employer": "Chrysalides · depuis 2014",
+  "experience": "~15 ans d'expérience",
+  "analysisDate": "12 juin 2026",
+  "score": 52,
+  "verdict": "partiel",
+  "role": "Directeur Ressources Humaines",
+  "useCases": [
+    { "label": "UC1 — Retournement",        "active": false },
+    { "label": "UC2 — Scale",               "active": true  },
+    { "label": "UC3 — Build-up/M&A",        "active": false },
+    { "label": "UC4 — DNVB/omnicanal",      "active": false },
+    { "label": "UC5 — Implantation France", "active": false },
+    { "label": "UC6 — Board/DG",            "active": true  }
+  ],
+  "eliminatoires": [
+    { "status": "valid",   "title": "E1 — Position CODIR",           "proof": "Présidente de Chrysalides depuis 2014, mandat social confirmé Pappers" },
+    { "status": "valid",   "title": "E2 — Expérience 10 ans+",       "proof": "~15 ans dont 12 en responsabilité dirigeante RH/conseil" },
+    { "status": "partial", "title": "E3 — Management de transition",  "proof": "Mandat social démontré, mais pas de mission de transition formalisée référencée" },
+    { "status": "partial", "title": "E4 — Orientation business",     "proof": "Résultats clients évoqués qualitativement ; KPIs propres à Chrysalides absents" }
+  ],
+  "roleLabel": "Dir. RH",
+  "roleCriteria": [
+    { "status": "invalid", "label": "DRH entité ≥ 200 personnes",          "note": "Cabinet de conseil, pas d'entité employeur de cette taille" },
+    { "status": "partial", "label": "Pilotage masse salariale / GPEC / CSE",   "note": "Pratiqué côté client, non démontré en propre" },
+    { "status": "partial", "label": "Transformation RH (PSE, M&A, scale)",     "note": "Accompagnement de transformations RH clients — indirect" },
+    { "status": "invalid", "label": "KPIs masse salariale, turnover, eNPS",    "note": "Absents du document" },
+    { "status": "valid",   "label": "Double compétence droit social",         "note": "Profil RH + conseil confirmé" }
+  ],
+  "strengths": [
+    "Expertise RH confirmée avec double dimension conseil/opérationnelle",
+    "Expérience en accompagnement de transformations organisationnelles (scale, restructuring)",
+    "Chrysalides est partenaire officiel Shyfters — fit écosystème immédiat",
+    "Réseau ETI/PME via activité de conseil terrain"
+  ],
+  "gaps": [
+    "Pas de poste DRH salarié dans une entité ≥ 200 personnes",
+    "Absence totale de KPIs chiffrés (masse salariale, turnover, eNPS)",
+    "Track record en management de transition RH non formalisé",
+    "Profil essentiellement 'conseil' — légitimité en direction opérationnelle à démontrer"
+  ],
+  "recommendation": "Demande de compléments",
+  "recommendationDetail": "Profil intéressant dans le contexte partenaire Shyfters/Chrysalides, mais insuffisamment documenté pour un placement direct en DRH de transition. Demander un CV détaillé avec périmètres, effectifs gérés et KPIs chiffrés avant entretien.",
+  "analysisFilename": "Matching_Melissa_Mabire_2026.pdf"
+}
