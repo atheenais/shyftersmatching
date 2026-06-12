@@ -1,0 +1,49 @@
+{
+  "name": "Richard Guillemand",
+  "initials": "RG",
+  "title": "Consultant Senior · Directeur Exécutif",
+  "employer": "Chrysalides-Phygital · depuis 2021",
+  "experience": "35 ans d'expérience",
+  "analysisDate": "11 juin 2026",
+  "score": 55,
+  "verdict": "partiel",
+  "role": "Directeur Commercial",
+  "useCases": [
+    { "label": "UC1 — Retournement",        "active": true  },
+    { "label": "UC2 — Scale",               "active": true  },
+    { "label": "UC3 — Build-up/M&A",        "active": false },
+    { "label": "UC4 — DNVB/omnicanal",      "active": false },
+    { "label": "UC5 — Implantation France", "active": false },
+    { "label": "UC6 — Board/DG",            "active": false }
+  ],
+  "eliminatoires": [
+    { "status": "valid",   "title": "E1 — Position CODIR",           "proof": "Membre Comité Exécutif France & Europe (Office Depot, 2014-2020)" },
+    { "status": "valid",   "title": "E2 — Expérience 15 ans+",       "proof": "33 ans d'activité (Toshiba 1993 → aujourd'hui), direction exécutive 2014-2020" },
+    { "status": "partial", "title": "E3 — Management de transition",  "proof": "Consulting via Chrysalides depuis 2021 — pas de mandat social explicite mentionné" },
+    { "status": "partial", "title": "E4 — Orientation business",     "proof": "KPIs présents mais concentrés sur 2016-2019 ; document majoritairement descriptif" }
+  ],
+  "roleLabel": "Dir. Commercial",
+  "roleCriteria": [
+    { "status": "valid",   "label": "Équipe ≥ 20 personnes",              "note": "200 pers." },
+    { "status": "valid",   "label": "Pilotage force de vente",              "note": "15 RSV · 135 CA" },
+    { "status": "valid",   "label": "Pricing & animation commerciale",      "note": "Sales Ops" },
+    { "status": "valid",   "label": "KPIs CA & marge",                      "note": "200M€ · +8M€ Ebit" },
+    { "status": "partial", "label": "Comptes clés retail",                "note": "B2B uniquement" },
+    { "status": "invalid", "label": "CA/m² · taux de transfo · panier moyen", "note": "" }
+  ],
+  "strengths": [
+    "17 ans Office Depot, progression jusqu'au COEX France & Europe",
+    "Retournement exécuté avec résultats mesurables (Ebit +8M€, coûts -20M€)",
+    "End-to-end : Sales Ops, FDV, pricing, CRM, nouveaux canaux de distribution",
+    "Ancré dans l'écosystème Chrysalides (partenaire Shyfters), posture d'intervenant active"
+  ],
+  "gaps": [
+    "Secteur hors cible : B2B fournitures de bureau, zéro retail / DNVB / phygital",
+    "KPIs insuffisants post-2020 — missions Chrysalides sans résultats chiffrés",
+    "5 ans en mode consultant — dernière direction exécutive : 2020",
+    "Aucune mention IA / data-driven ni expérience e-commerce / omnicanal"
+  ],
+  "recommendation": "Demande de compléments avant entretien",
+  "recommendationDetail": "CV structuré avec KPIs par mission Chrysalides (2021-2026) + clarification disponibilité mandat exécutif. Si enrichi, pertinent sur UC1 retournement commercial B2B.",
+  "analysisFilename": "Matching_Richard_Guillemand_2025.md"
+}

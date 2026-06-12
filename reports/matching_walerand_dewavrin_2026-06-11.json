@@ -1,0 +1,49 @@
+{
+  "name": "Walerand Dewavrin",
+  "initials": "WD",
+  "title": "CEO Store Transition — Directeur Omnicanal",
+  "employer": "Store Transition · depuis mars 2024",
+  "experience": "20 ans d'expérience",
+  "analysisDate": "11 juin 2026",
+  "score": 62,
+  "verdict": "partiel",
+  "role": "Directeur Marketing Digital",
+  "useCases": [
+    { "label": "UC1 — Retournement",        "active": false },
+    { "label": "UC2 — Scale",               "active": true  },
+    { "label": "UC3 — Build-up/M&A",        "active": false },
+    { "label": "UC4 — DNVB/omnicanal",      "active": true  },
+    { "label": "UC5 — Implantation France", "active": true  },
+    { "label": "UC6 — Board/DG",            "active": false }
+  ],
+  "eliminatoires": [
+    { "status": "valid",   "title": "E1 — Position CODIR",           "proof": "Membre CODIR BZB confirmé LinkedIn (CODIR TOUR) ; Directeur Omni Business août 2020-juil. 2024" },
+    { "status": "valid",   "title": "E2 — Expérience 15 ans+",       "proof": "20 ans confirmés : TAO fév. 2007-août 2020 + BZB août 2020-nov. 2024 + Store Transition mars 2024" },
+    { "status": "valid",   "title": "E3 — Management de transition",  "proof": "CEO HEMAJE SAS (Store Transition) depuis mars 2024 ; POCs sur 3 marques retail" },
+    { "status": "partial", "title": "E4 — Orientation business",     "proof": "20% CA digital (TAO), 15 ouvertures BZB, +18% page panier (Altima) — aucun KPI financier" }
+  ],
+  "roleLabel": "Dir. Marketing Digital",
+  "roleCriteria": [
+    { "status": "valid",   "label": "Direction marketing retail/e-com",          "note": "BZB 90 magasins + TAO 15 ans" },
+    { "status": "partial", "label": "Acquisition, CRM, CAC/LTV, brand equity",   "note": "Acquisition + migration CRM BZB — KPIs CAC/LTV/ROAS absents" },
+    { "status": "valid",   "label": "Transformation omnicanale",                  "note": "Plan retournement omnicanal BZB, SFS/CTC, ship-from-store" },
+    { "status": "invalid", "label": "KPIs : CAC, LTV, ROAS, notoriété",      "note": "Absent plaquette ET LinkedIn" }
+  ],
+  "strengths": [
+    "20 ans exclusivement retail/e-commerce/omnicanal — secteur cœur Shyfters",
+    "Périmètre CODIR transversal BZB : Digital + Client + Retail + IT (90 magasins, 4 ans)",
+    "Expertise technique déployée : OMS, RCU, PIM, TMS, CRM — profil opérationnel rare",
+    "Double casquette précoce (2007-2009) : Appro Magasin + E-com International simultanés chez TAO",
+    "CEO Store Transition, Lauréat OR Nuit Commerce 2024 — posture entrepreneuriale avérée"
+  ],
+  "gaps": [
+    "KPIs financiers absents de tous les supports publics (plaquette ET LinkedIn) — lacune structurelle",
+    "Sortie progressive BZB (Omni Business juil. 2024 → Directeur omni client nov. 2024) à clarifier",
+    "Zéro exposition au retournement financier ou M&A (UC1 et UC3 non couverts)",
+    "CODIR seulement depuis août 2020 — 15 ans chez TAO en tant que Responsable (non-CODIR)",
+    "Entités mid-market uniquement : BZB ~72M€ CA, pas de contexte LBO/fonds PE"
+  ],
+  "recommendation": "Demande de compléments + entretien exploratoire",
+  "recommendationDetail": "KPIs absents de tous les supports publics : contacter directement wdewavrin@gmail.com (ou via Caboost) pour un document avec métriques précises par mandat. Clarifier les conditions de sortie de BZB (nov. 2024).",
+  "analysisFilename": "Matching_Walerand_Dewavrin_2026.pdf"
+}

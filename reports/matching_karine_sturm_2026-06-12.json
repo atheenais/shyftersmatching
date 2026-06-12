@@ -1,0 +1,49 @@
+{
+  "name": "Karine STURM",
+  "initials": "KS",
+  "title": "RRH Tape à l'Œil (2004-2011) · Consultante RH indépendante",
+  "employer": "KRH Conseil EURL · depuis 2017",
+  "experience": "25 ans (Etam · TAO · Kiabi · Sparkling · KRH)",
+  "analysisDate": "12 juin 2026",
+  "score": 32,
+  "verdict": "non-match",
+  "role": "Directeur Ressources Humaines",
+  "useCases": [
+    { "label": "UC1 — Retournement",        "active": false },
+    { "label": "UC2 — Scale",               "active": false },
+    { "label": "UC3 — Build-up/M&A",        "active": false },
+    { "label": "UC4 — DNVB/omnicanal",      "active": false },
+    { "label": "UC5 — Implantation France", "active": false },
+    { "label": "UC6 — Board/DG",            "active": false }
+  ],
+  "eliminatoires": [
+    { "status": "partial", "title": "E1 — Position CODIR",           "proof": "RRH TAO ~300 pers. (2004-2011) : rôle CODIR possible, non confirmé dans le CV — à vérifier via E. Blanchon (ex-CEO TAO, co-fondateur Shyfters)" },
+    { "status": "partial", "title": "E2 — Expérience 10 ans+",       "proof": "25 ans confirmés (Etam→TAO→Kiabi→Sparkling→KRH) ; 7 ans en responsabilité RH chez TAO" },
+    { "status": "partial", "title": "E3 — Management de transition", "proof": "Délégation RH dans l'offre KRH Conseil ≈ DRH externalisée temps partagé ; mais périmètre TPE/PME uniquement" },
+    { "status": "invalid", "title": "E4 — Orientation business",     "proof": "Zéro KPI sur l'intégralité du CV — pas de masse salariale, turnover, EBITDA, CA ni effectifs chiffrés" }
+  ],
+  "roleLabel": "DRH",
+  "roleCriteria": [
+    { "status": "partial", "label": "DRH d'une entité ≥ 200 personnes",    "note": "RRH TAO ~300 pers. (titre inférieur à DRH)" },
+    { "status": "invalid", "label": "Masse salariale / GPEC / CSE",         "note": "Non mentionné dans le CV" },
+    { "status": "invalid", "label": "Transformation RH (PSE, M&A, scale)",  "note": "Absent de tout le parcours" },
+    { "status": "invalid", "label": "KPIs (MS/CA, turnover, eNPS)",         "note": "Aucun dans aucun document" }
+  ],
+  "strengths": [
+    "RRH Tape à l'Œil 7 ans (2004-2011) : politique RH complète, équipe 12 pers., ~300 collaborateurs — maison d'Edouard Blanchon co-fondateur Shyfters",
+    "Polyvalence rare chez TAO : RH + pilotage offre multi-canal + achats — profil hybride opérationnel/fonctionnel",
+    "25 ans retail (Etam, TAO, Kiabi) + 9 ans conseil RH — ancrage secteur réel, réseau cohérent avec cibles Shyfters",
+    "Co-fondatrice de PLINK avec Chrysalides (partenaire Shyfters) — intégrée à l'écosystème",
+    "Formation SKEMA + Master 2 MRH (formation continue)"
+  ],
+  "gaps": [
+    "Jamais DRH : uniquement RRH (niveau N-1) — aucune évolution vers direction après 2011",
+    "Zéro KPI business sur tout le CV — E4 directement rédhibitoire selon règle Shyfters",
+    "Trajectoire post-TAO en recul : chef de marché (Kiabi) puis office manager puis consultante TPE/PME",
+    "Aucune expérience documentée PSE, restructuring RH d'envergure ou intégration M&A",
+    "Périmètre actuel KRH Conseil = start-up/TPE/PME, en-dessous du profil ETI 20M€+ attendu"
+  ],
+  "recommendation": "Rejet comme Shyfter DRH",
+  "recommendationDetail": "E4 rédhibitoire (0 KPI) + niveau RRH insuffisant. Connexion TAO/Blanchon notable — à qualifier directement avec le fondateur. Partenariat via PLINK/Chrysalides reste le bon cadre pour cette collaboration.",
+  "analysisFilename": "Matching_Karine_STURM_2026.pdf"
+}
