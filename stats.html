@@ -68,7 +68,8 @@
     }
     .bar-label {
       font-size: 13px;
-      min-width: 200px;
+      width: 200px;
+      flex-shrink: 0;
       color: var(--text);
       white-space: nowrap;
       overflow: hidden;
@@ -109,7 +110,11 @@
 
     @media (max-width: 600px) {
       .kpi-grid { grid-template-columns: 1fr; }
-      .bar-label { min-width: 120px; font-size: 12px; }
+      .bar-label { width: 130px; font-size: 12px; }
+      .bar-count { min-width: 40px; font-size: 12px; }
+      .recent-col-role { display: none; }
+      .recent-table td { padding: 8px 0; font-size: 13px; }
+      .recent-table .recent-col-pl { padding-left: 8px; }
     }
   </style>
 </head>
@@ -265,8 +270,8 @@
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><strong>${esc(r.candidat_nom)}</strong></td>
-      <td class="text-muted" style="padding-left:16px">${esc(r.poste_vise)}</td>
-      <td style="padding-left:16px"><span class="badge ${badgeClass(r.recommandation)}">${badgeLabel(r.recommandation)}</span></td>
+      <td class="text-muted recent-col-role recent-col-pl">${esc(r.poste_vise)}</td>
+      <td class="recent-col-pl"><span class="badge ${badgeClass(r.recommandation)}">${badgeLabel(r.recommandation)}</span></td>
       <td class="text-muted" style="text-align:right">${fmtDate(r.created_at)}</td>`;
     tr.addEventListener('click', () => { window.location.href = `rapport.html?id=${r.id}`; });
     table.appendChild(tr);
