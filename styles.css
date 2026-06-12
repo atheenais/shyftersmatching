@@ -286,6 +286,21 @@ td {
 .score-mid   { background: rgba(245,158,11,.2); color: #FCD34D; }
 .score-low   { background: rgba(239,68,68,.2);  color: #FCA5A5; }
 
+/* ===== SORTABLE HEADERS ===== */
+.th-sort { cursor: pointer; user-select: none; }
+.th-sort:hover { color: var(--text); }
+.sort-arrow { margin-left: 4px; opacity: 0.35; font-size: 10px; }
+.th-sort.sort-active { color: var(--text); }
+.th-sort.sort-active .sort-arrow { opacity: 1; color: var(--accent); }
+
+/* ===== DANGER BUTTON ===== */
+.btn-danger {
+  color: var(--danger);
+  border: 1px solid rgba(239,68,68,.35);
+  background: transparent;
+}
+.btn-danger:hover { background: rgba(239,68,68,.1); border-color: var(--danger); }
+
 /* ===== FILTER PILLS ===== */
 .filter-pill {
   padding: 5px 14px;

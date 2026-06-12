@@ -105,6 +105,26 @@
     .no-grille-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
 
     /* ── Footer ── */
+    /* ── Actions auteur ── */
+    .rapport-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .delete-confirm {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: rgba(239,68,68,.08);
+      border: 1px solid rgba(239,68,68,.2);
+    }
+
     .rapport-footer {
       font-size: 11px;
       color: var(--muted);
@@ -352,8 +372,20 @@ function scoreClass(s) {
   document.title = `Shyfters Matching — ${r.candidat_nom}`;
 
   const d = r.detail_grille;
+  const isAuthor = session.user.id === r.auteur_id;
 
   content.innerHTML = `
+    ${isAuthor ? `
+    <div class="rapport-actions">
+      <a href="new.html?id=${r.id}" class="btn btn-ghost btn-sm">✏️ Modifier</a>
+      <button class="btn btn-danger btn-sm" id="deleteBtn">🗑 Supprimer</button>
+      <div class="delete-confirm" id="deleteConfirm" hidden>
+        Supprimer définitivement ce rapport ?
+        <button class="btn btn-sm" id="deleteOk" style="background:var(--danger);color:#fff;border:none">Confirmer</button>
+        <button class="btn btn-ghost btn-sm" id="deleteCancel">Annuler</button>
+      </div>
+    </div>` : ''}
+
     <!-- Header rapport -->
     <div class="rapport-header">
       <div class="rapport-identity">
@@ -395,6 +427,40 @@ function scoreClass(s) {
 
     <div class="rapport-footer">Shyfters Matching Tool · ${esc(r.analysis_filename || '')}</div>
   `;
+
+  // Suppression
+  if (isAuthor) {
+    const deleteBtn     = document.getElementById('deleteBtn');
+    const deleteConfirm = document.getElementById('deleteConfirm');
+    const deleteOk      = document.getElementById('deleteOk');
+    const deleteCancel  = document.getElementById('deleteCancel');
+
+    deleteBtn.addEventListener('click', () => {
+      deleteConfirm.hidden = false;
+      deleteBtn.hidden = true;
+    });
+
+    deleteCancel.addEventListener('click', () => {
+      deleteConfirm.hidden = true;
+      deleteBtn.hidden = false;
+    });
+
+    deleteOk.addEventListener('click', async () => {
+      deleteOk.disabled = true;
+      deleteOk.textContent = 'Suppression…';
+
+      const { error } = await sb.from('rapports').delete().eq('id', id);
+
+      if (error) {
+        deleteOk.disabled = false;
+        deleteOk.textContent = 'Confirmer';
+        alert('Erreur lors de la suppression : ' + error.message);
+        return;
+      }
+
+      window.location.href = 'list.html';
+    });
+  }
 })();
 </script>
 

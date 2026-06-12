@@ -139,8 +139,8 @@
 
     <div class="list-header" style="margin-bottom:24px">
       <div>
-        <div class="list-title">Nouveau rapport</div>
-        <div class="list-meta">Enregistrer un matching produit dans Claude</div>
+        <div class="list-title" id="formTitle">Nouveau rapport</div>
+        <div class="list-meta" id="formSubtitle">Enregistrer un matching produit dans Claude</div>
       </div>
     </div>
 
@@ -282,6 +282,45 @@
   const alertBox  = document.getElementById('alert');
   const submitBtn = document.getElementById('submitBtn');
 
+  // ── Mode édition ──
+  const editId = new URLSearchParams(window.location.search).get('id');
+
+  if (editId) {
+    const { data: existing, error: loadErr } = await sb
+      .from('rapports').select('*').eq('id', editId).single();
+
+    if (loadErr || !existing) {
+      alertBox.textContent = 'Rapport introuvable.';
+      alertBox.className = 'alert alert-error show';
+    } else if (existing.auteur_id !== session.user.id) {
+      alertBox.textContent = 'Vous n\'êtes pas autorisé à modifier ce rapport.';
+      alertBox.className = 'alert alert-error show';
+      submitBtn.disabled = true;
+    } else {
+      document.getElementById('formTitle').textContent    = 'Modifier le rapport';
+      document.getElementById('formSubtitle').textContent = existing.candidat_nom || '';
+      submitBtn.textContent = 'Enregistrer les modifications';
+
+      document.getElementById('candidat_nom').value      = existing.candidat_nom      || '';
+      document.getElementById('poste_actuel').value      = existing.poste_actuel      || '';
+      document.getElementById('client').value            = existing.client            || '';
+      document.getElementById('score_global').value      = existing.score_global      ?? '';
+      document.getElementById('synthese').value          = existing.synthese          || '';
+      document.getElementById('analysis_filename').value = existing.analysis_filename || '';
+
+      if (existing.poste_vise)
+        document.getElementById('poste_vise').value = existing.poste_vise;
+
+      if (existing.recommandation) {
+        const radio = document.querySelector(`input[name="recommandation"][value="${existing.recommandation}"]`);
+        if (radio) radio.checked = true;
+      }
+
+      if (existing.detail_grille)
+        document.getElementById('jsonTextarea').value = JSON.stringify(existing.detail_grille, null, 2);
+    }
+  }
+
   // ── Import JSON ──
   const ROLES_VALIDES = [
     'Directeur Général','Directeur Marketing Digital','Directeur Commercial',
@@ -394,20 +433,36 @@
       synthese,
       analysis_filename: analysis_filename || null,
       detail_grille,
-      auteur_id: session.user.id,
     };
 
-    const { data, error } = await sb.from('rapports').insert([payload]).select('id').single();
+    if (editId) {
+      // UPDATE
+      const { error } = await sb
+        .from('rapports')
+        .update({ ...payload, updated_at: new Date().toISOString() })
+        .eq('id', editId);
 
-    if (error) {
-      showAlert('Erreur lors de l\'enregistrement : ' + error.message);
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Enregistrer le rapport';
-      return;
+      if (error) {
+        showAlert('Erreur lors de la modification : ' + error.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Enregistrer les modifications';
+        return;
+      }
+      window.location.href = `rapport.html?id=${editId}`;
+    } else {
+      // INSERT
+      const { error } = await sb
+        .from('rapports')
+        .insert([{ ...payload, auteur_id: session.user.id }]);
+
+      if (error) {
+        showAlert('Erreur lors de l\'enregistrement : ' + error.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Enregistrer le rapport';
+        return;
+      }
+      window.location.href = 'list.html';
     }
-
-    // Succès → redirection vers la liste
-    window.location.href = 'list.html';
   });
 })();
 </script>
