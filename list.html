@@ -48,7 +48,7 @@
     <div class="sync-panel">
       <div class="sync-panel-header">
         <div class="sync-panel-title">↓ Rapports depuis GitHub</div>
-        <button class="btn btn-ghost btn-sm" id="syncClose">✕</button>
+        <button class="btn btn-ghost btn-sm" id="syncClose" aria-label="Fermer">✕</button>
       </div>
       <!-- Token GitHub (optionnel, augmente le quota API de 60 à 5000 req/h) -->
       <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -75,13 +75,6 @@
     </div>
     <select id="roleFilter" style="max-width:220px">
       <option value="">Tous les rôles</option>
-      <option>Directeur Général</option>
-      <option>Directeur Marketing Digital</option>
-      <option>Directeur Commercial</option>
-      <option>Directeur Value Chain</option>
-      <option>Directeur Finance et Juridique</option>
-      <option>Directeur Ressources Humaines</option>
-      <option>Directeur Systèmes d'Information</option>
     </select>
   </div>
 
@@ -118,8 +111,8 @@
 
 <!-- Supabase CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js?v=1"></script>
-<script src="auth.js?v=1"></script>
+<script src="config.js?v=2"></script>
+<script src="auth.js?v=2"></script>
 <script>
 (async () => {
   const session = await requireAuth();
@@ -300,12 +293,15 @@
         <td><strong>${esc(r.candidat_nom)}</strong></td>
         <td class="text-muted">${esc(r.poste_vise)}</td>
         <td class="text-muted">${esc(r.client)}</td>
-        <td><span class="score-pill ${scoreClass(r.score_global)}">${r.score_global}</span></td>
+        <td><span class="score-pill ${scoreClass(r.score_global)}">${r.score_global ?? '—'}</span></td>
         <td><span class="badge ${badgeClass(r.recommandation)}">${badgeLabel(r.recommandation)}</span></td>
         <td class="text-muted">${fmtDate(r.created_at)}</td>
         <td class="text-muted">${esc(r.profiles?.nom)}</td>
       `;
-      tr.addEventListener('click', () => { window.location.href = `rapport.html?id=${r.id}`; });
+      tr.setAttribute('tabindex', '0');
+      const nav = () => { window.location.href = `rapport.html?id=${r.id}`; };
+      tr.addEventListener('click', nav);
+      tr.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nav(); } });
       tbody.appendChild(tr);
     });
   }
@@ -349,11 +345,13 @@
   // ── Sync GitHub ──
   const REPO           = 'atheenais/shyftersmatching';
   const GH_API         = `https://api.github.com/repos/${REPO}/contents/reports`;
-  const ROLES_VALIDES  = [
-    'Directeur Général','Directeur Marketing Digital','Directeur Commercial',
-    'Directeur Value Chain','Directeur Finance et Juridique',
-    'Directeur Ressources Humaines',"Directeur Systèmes d'Information"
-  ];
+  // Popule le filtre rôle depuis la config globale
+  const roleFilterEl = document.getElementById('roleFilter');
+  ROLES_VALIDES.forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = opt.textContent = r;
+    roleFilterEl.appendChild(opt);
+  });
 
   const syncPanel   = document.getElementById('syncPanel');
   const syncContent = document.getElementById('syncContent');
@@ -364,6 +362,10 @@
   ghTokenInput.value = localStorage.getItem(GH_TOKEN_KEY) || '';
   document.getElementById('ghTokenSave').addEventListener('click', () => {
     const t = ghTokenInput.value.trim();
+    if (t && !t.startsWith('ghp_') && !t.startsWith('github_pat_')) {
+      showToast('Token invalide — doit commencer par ghp_ ou github_pat_', 'error');
+      return;
+    }
     if (t) localStorage.setItem(GH_TOKEN_KEY, t);
     else localStorage.removeItem(GH_TOKEN_KEY);
     showToast(t ? 'Token enregistré' : 'Token supprimé', 'info');
@@ -502,6 +504,7 @@
         style="flex-shrink:0;color:var(--success);border-color:var(--success)">✓ Voir le rapport →</a>`;
 
     // Ajout du rapport dans la liste locale sans recharger
+    inserted.profiles = { nom: session.user.user_metadata?.full_name || session.user.email };
     rapports.unshift(inserted);
     meta.textContent = `${rapports.length} rapport${rapports.length > 1 ? 's' : ''}`;
     tableWrap.hidden = false;

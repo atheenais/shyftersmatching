@@ -133,6 +133,12 @@ input:focus, select:focus, textarea:focus {
   border-color: var(--accent);
 }
 
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 input::placeholder { color: var(--muted); opacity: 0.6; }
 
 /* ===== BUTTONS ===== */

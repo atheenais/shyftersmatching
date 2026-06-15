@@ -186,13 +186,6 @@
             <label for="poste_vise">Rôle CODIR visé <span style="color:var(--danger)">*</span></label>
             <select id="poste_vise" required>
               <option value="" disabled selected>Choisir un rôle…</option>
-              <option>Directeur Général</option>
-              <option>Directeur Marketing Digital</option>
-              <option>Directeur Commercial</option>
-              <option>Directeur Value Chain</option>
-              <option>Directeur Finance et Juridique</option>
-              <option>Directeur Ressources Humaines</option>
-              <option>Directeur Systèmes d'Information</option>
             </select>
           </div>
           <div class="form-group">
@@ -270,8 +263,8 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js?v=1"></script>
-<script src="auth.js?v=1"></script>
+<script src="config.js?v=2"></script>
+<script src="auth.js?v=2"></script>
 <script>
 (async () => {
   const session = await requireAuth();
@@ -280,6 +273,14 @@
   const form      = document.getElementById('reportForm');
   const alertBox  = document.getElementById('alert');
   const submitBtn = document.getElementById('submitBtn');
+
+  // ── Popule le select rôle depuis la config globale ──
+  const posteSelect = document.getElementById('poste_vise');
+  ROLES_VALIDES.forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = opt.textContent = r;
+    posteSelect.appendChild(opt);
+  });
 
   // ── Slider de score ──
   const scoreRange = document.getElementById('score_global');
@@ -337,11 +338,7 @@
   }
 
   // ── Import JSON ──
-  const ROLES_VALIDES = [
-    'Directeur Général','Directeur Marketing Digital','Directeur Commercial',
-    'Directeur Value Chain','Directeur Finance et Juridique',
-    'Directeur Ressources Humaines','Directeur Systèmes d\'Information'
-  ];
+  // ROLES_VALIDES vient de config.js (global)
 
   // Lecture de fichier → même logique que le collage
   document.getElementById('importFile').addEventListener('change', (e) => {
