@@ -369,11 +369,17 @@
     showToast(t ? 'Token enregistré' : 'Token supprimé', 'info');
   });
 
+  // Headers pour l'API GitHub (listing)
   function ghFetchHeaders() {
     const token = localStorage.getItem(GH_TOKEN_KEY);
     const h = { 'Accept': 'application/vnd.github+json' };
     if (token) h['Authorization'] = `Bearer ${token}`;
     return h;
+  }
+  // Headers pour les fichiers raw (download_url → raw.githubusercontent.com)
+  function rawFetchHeaders() {
+    const token = localStorage.getItem(GH_TOKEN_KEY);
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
   }
 
   // Source de vérité partagée entre appareils : les rapports déjà présents dans Supabase.
@@ -435,11 +441,13 @@
 
     let d;
     try {
-      const res = await fetch(url, { headers: ghFetchHeaders() });
+      const res = await fetch(url, { headers: rawFetchHeaders() });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       d = await res.json();
     } catch(e) {
-      btn.disabled = false; btn.textContent = 'Réessayer';
+      btn.disabled = false;
+      btn.textContent = 'Réessayer';
+      btn.title = e.message;
       btn.style.cssText += ';background:var(--danger)';
       return;
     }
@@ -475,9 +483,12 @@
 
     const { data: inserted, error } = await sb.from('rapports').insert([payload]).select().single();
 
-    if (error) {
-      btn.disabled = false; btn.textContent = 'Erreur — réessayer';
+    if (error || !inserted) {
+      btn.disabled = false;
+      btn.textContent = 'Erreur — réessayer';
+      btn.title = error?.message || 'Aucune donnée retournée par Supabase';
       btn.style.cssText += ';background:var(--danger)';
+      console.error('importGHFile insert error', error);
       return;
     }
 
