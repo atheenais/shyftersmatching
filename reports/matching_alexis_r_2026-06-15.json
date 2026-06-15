@@ -1,0 +1,49 @@
+{
+  "name": "Alexis R.",
+  "initials": "AR",
+  "title": "Directeur de réseaux retail (profil anonymisé)",
+  "employer": "Mission Maison Montagut · depuis 2025",
+  "experience": "21 ans d'expérience",
+  "analysisDate": "15 juin 2026",
+  "score": 73,
+  "verdict": "partiel",
+  "role": "Directeur Commercial",
+  "useCases": [
+    { "label": "UC1 — Retournement", "active": false },
+    { "label": "UC2 — Scale", "active": true },
+    { "label": "UC3 — Build-up/M&A", "active": false },
+    { "label": "UC4 — DNVB/omnicanal", "active": true },
+    { "label": "UC5 — Implantation France", "active": false },
+    { "label": "UC6 — Board/DG", "active": false }
+  ],
+  "eliminatoires": [
+    { "status": "valid", "title": "E1 — Position CODIR", "proof": "Membre CODIR Duclot, Head of Retail Aubade (180 collab., 6 régionaux)" },
+    { "status": "valid", "title": "E2 — Expérience 10 ans+", "proof": "21 ans en direction de réseaux retail" },
+    { "status": "valid", "title": "E3 — Management de transition", "proof": "Mission audit & développement performance (Maison Montagut)" },
+    { "status": "valid", "title": "E4 — Orientation business", "proof": "CA 8–30 M€, +14 % CA, +16 pts satisfaction, optimisation P&L" }
+  ],
+  "roleLabel": "Directeur Commercial",
+  "roleCriteria": [
+    { "status": "valid", "label": "Direction commerciale retail, équipe ≥ 20", "note": "180 / 130 / 120 collab." },
+    { "status": "valid", "label": "Pilotage réseau magasins / force de vente", "note": "24–30 POS" },
+    { "status": "partial", "label": "Pricing / animation / comptes clés", "note": "pricing & comptes clés absents" },
+    { "status": "partial", "label": "KPIs CA / marge / CA-m² / panier moyen", "note": "CA & conversion OK" }
+  ],
+  "strengths": [
+    "21 ans de direction de réseaux retail — cœur de cible Shyfters (retail/phygital)",
+    "Posture de direction confirmée : CODIR Duclot + Head of Retail (180 collab.)",
+    "Orientation business chiffrée : CA 8–30 M€, +14 % CA, +16 pts satisfaction",
+    "Track record scale/ouvertures : 4 magasins 2023, franchises intl, Kiabi 19e→3e",
+    "Déjà en posture transition/mission (Maison Montagut) — embarquement immédiat"
+  ],
+  "gaps": [
+    "Profil mono-fonctionnel commercial : pas de P&L complet de DG ni volet finance",
+    "KPIs souvent qualitatifs ou de périmètre modeste, peu de résultats financiers profonds",
+    "Pricing, comptes clés, CA/m², panier moyen non couverts",
+    "Aucune expérience retournement/restructuring ni M&A/build-up (UC1 & UC3 absents)",
+    "Profil anonymisé — aucune vérification web nominative possible"
+  ],
+  "recommendation": "Entretien",
+  "recommendationDetail": "Valider la profondeur des résultats financiers (marge/EBITDA), l'expérience pricing/comptes clés et l'appétence transition ; demander un CV nominatif chiffré.",
+  "analysisFilename": "Matching_Alexis_R_2026.pdf"
+}
