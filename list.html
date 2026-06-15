@@ -50,6 +50,15 @@
         <div class="sync-panel-title">↓ Rapports depuis GitHub</div>
         <button class="btn btn-ghost btn-sm" id="syncClose">✕</button>
       </div>
+      <!-- Token GitHub (optionnel, augmente le quota API de 60 à 5000 req/h) -->
+      <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <label style="font-size:12px;color:var(--muted);white-space:nowrap;text-transform:none;letter-spacing:0">
+          Token GitHub (optionnel)
+        </label>
+        <input type="password" id="ghTokenInput" placeholder="ghp_…"
+          style="flex:1;min-width:160px;font-size:12px;padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:monospace">
+        <button class="btn btn-ghost btn-sm" id="ghTokenSave" style="white-space:nowrap">Enregistrer</button>
+      </div>
       <div id="syncContent"></div>
     </div>
   </div>
@@ -348,6 +357,24 @@
 
   const syncPanel   = document.getElementById('syncPanel');
   const syncContent = document.getElementById('syncContent');
+  const GH_TOKEN_KEY = 'shyfters-gh-token';
+
+  // ── Token GitHub (quota API 60 → 5000 req/h) ──
+  const ghTokenInput = document.getElementById('ghTokenInput');
+  ghTokenInput.value = localStorage.getItem(GH_TOKEN_KEY) || '';
+  document.getElementById('ghTokenSave').addEventListener('click', () => {
+    const t = ghTokenInput.value.trim();
+    if (t) localStorage.setItem(GH_TOKEN_KEY, t);
+    else localStorage.removeItem(GH_TOKEN_KEY);
+    showToast(t ? 'Token enregistré' : 'Token supprimé', 'info');
+  });
+
+  function ghFetchHeaders() {
+    const token = localStorage.getItem(GH_TOKEN_KEY);
+    const h = { 'Accept': 'application/vnd.github+json' };
+    if (token) h['Authorization'] = `Bearer ${token}`;
+    return h;
+  }
 
   // Source de vérité partagée entre appareils : les rapports déjà présents dans Supabase.
   // On déduit les fichiers déjà importés via la colonne analysis_filename (et non le localStorage,
@@ -370,12 +397,13 @@
 
     let files = [];
     try {
-      const res = await fetch(GH_API);
+      const res = await fetch(GH_API, { headers: ghFetchHeaders() });
       if (res.status === 404) files = [];
+      else if (res.status === 403) throw new Error('Quota GitHub dépassé (60 req/h sans token). Renseignez un token GitHub ci-dessus pour passer à 5 000 req/h.');
       else if (!res.ok) throw new Error(`GitHub API : ${res.status}`);
       else files = await res.json();
     } catch(e) {
-      syncContent.innerHTML = `<div style="padding:14px 16px;color:var(--danger);font-size:13px">Erreur : ${e.message}</div>`;
+      syncContent.innerHTML = `<div style="padding:14px 16px;color:var(--danger);font-size:13px">⚠ ${e.message}</div>`;
       return;
     }
 
@@ -407,7 +435,7 @@
 
     let d;
     try {
-      const res = await fetch(url);
+      const res = await fetch(url, { headers: ghFetchHeaders() });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       d = await res.json();
     } catch(e) {
