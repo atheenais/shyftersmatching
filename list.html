@@ -162,7 +162,7 @@
   // Charger les rapports
   const { data: rapports, error } = await sb
     .from('rapports')
-    .select('id, candidat_nom, poste_vise, client, score_global, recommandation, created_at, profiles(nom)')
+    .select('id, candidat_nom, poste_vise, client, score_global, recommandation, created_at, analysis_filename, profiles(nom)')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -340,7 +340,6 @@
   // ── Sync GitHub ──
   const REPO           = 'atheenais/shyftersmatching';
   const GH_API         = `https://api.github.com/repos/${REPO}/contents/reports`;
-  const IMPORTED_KEY   = 'shyfters-gh-imported';
   const ROLES_VALIDES  = [
     'Directeur Général','Directeur Marketing Digital','Directeur Commercial',
     'Directeur Value Chain','Directeur Finance et Juridique',
@@ -350,11 +349,15 @@
   const syncPanel   = document.getElementById('syncPanel');
   const syncContent = document.getElementById('syncContent');
 
-  function getImported() { return new Set(JSON.parse(localStorage.getItem(IMPORTED_KEY) || '[]')); }
-  function markImported(name) {
-    const s = getImported(); s.add(name);
-    localStorage.setItem(IMPORTED_KEY, JSON.stringify([...s]));
+  // Source de vérité partagée entre appareils : les rapports déjà présents dans Supabase.
+  // On déduit les fichiers déjà importés via la colonne analysis_filename (et non le localStorage,
+  // qui est propre à chaque navigateur et réaffichait donc tout sur un nouvel appareil).
+  async function getImportedFromDB() {
+    const { data, error } = await sb.from('rapports').select('analysis_filename');
+    if (error) { console.warn('getImportedFromDB', error); return new Set(); }
+    return new Set((data || []).map(r => r.analysis_filename).filter(Boolean));
   }
+
   function fmtGHName(name) {
     return name.replace(/^matching_/, '').replace(/\.json$/, '').replace(/_/g, ' ');
   }
@@ -376,8 +379,10 @@
       return;
     }
 
-    const imported = getImported();
-    const newFiles = files.filter(f => f.name.endsWith('.json') && !imported.has(f.name));
+    const imported = await getImportedFromDB();
+    const newFiles = files.filter(f =>
+      f.name.endsWith('.json') && !f.name.startsWith('_') && !imported.has(f.name)
+    );
 
     if (newFiles.length === 0) {
       syncContent.innerHTML = '<div style="padding:14px 16px;color:var(--muted);font-size:13px">✓ Aucun nouveau rapport à importer.</div>';
@@ -448,7 +453,6 @@
       return;
     }
 
-    markImported(name);
     showToast(`✓ ${fmtGHName(name)} importé avec succès`, 'success');
 
     // Mise à jour visuelle de la ligne
