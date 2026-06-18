@@ -1,0 +1,49 @@
+{
+  "name": "Fabrice Thilliez",
+  "initials": "FT",
+  "title": "PMO / Direction de transformation · Consultant",
+  "employer": "Chrysalides (COMOP) · depuis 2020",
+  "experience": "13 ans d'expérience",
+  "analysisDate": "18 juin 2026",
+  "score": 48,
+  "verdict": "non-match",
+  "role": "Transversal — mode Mission PMO (pas de siège CODIR)",
+  "useCases": [
+    { "label": "UC1 — Retournement", "active": false },
+    { "label": "UC2 — Scale", "active": true },
+    { "label": "UC3 — Build-up/M&A", "active": false },
+    { "label": "UC4 — DNVB/omnicanal", "active": true },
+    { "label": "UC5 — Implantation France", "active": false },
+    { "label": "UC6 — Board/DG", "active": false }
+  ],
+  "eliminatoires": [
+    { "status": "invalid", "title": "E1 — Position CODIR / P&L", "proof": "Rôles PMO / AMOA / chef de projet. Direction = COMOP du cabinet, pas P&L d'une entreprise opérante." },
+    { "status": "partial", "title": "E2 — Expérience 10 ans+", "proof": "13 ans confirmés, mais part en responsabilité de direction faible." },
+    { "status": "partial", "title": "E3 — Management de transition", "proof": "Missions type transition (TAO Kids) en posture PMO externe, pas mandataire social." },
+    { "status": "invalid", "title": "E4 — Orientation business", "proof": "Fiche descriptive : volumétrie présente mais aucun impact chiffré (CA, marge, EBITDA, ROI)." }
+  ],
+  "roleLabel": "DG transverse (réf.)",
+  "roleCriteria": [
+    { "status": "valid", "label": "Cycles de transformation pilotés", "note": "riche" },
+    { "status": "valid", "label": "Appétence IA / data-driven", "note": "JIRA, Power BI" },
+    { "status": "invalid", "label": "Responsabilité P&L complète", "note": "" },
+    { "status": "invalid", "label": "KPIs CA / EBITDA / FCF", "note": "" }
+  ],
+  "strengths": [
+    "Track record retail / e-commerce / phygital dense (Jules, BZB, Auchan, Kiabi, ADEO, Rexel).",
+    "Expertise PMO / transformation de premier ordre : cadrage à déploiement, gouvernance.",
+    "Appétence IA / data-driven — différenciateur transversal Shyfters.",
+    "Couverture réelle de 2 use cases (UC2 Scale, UC4 omnicanal).",
+    "Posture conduite du changement & animation (séminaires 210 pers., coaching)."
+  ],
+  "gaps": [
+    "Pas de position de direction P&L (cœur du modèle CODIR non couvert).",
+    "Aucun résultat business chiffré — gap rédhibitoire en l'état (E4).",
+    "Pas de mandat social / direction de transition au sens strict.",
+    "Aucun KPI financier (CA, EBITDA, FCF) sur les expériences.",
+    "Rôle mono-CODIR non identifiable — profil transversal."
+  ],
+  "recommendation": "Repositionnement / Demande de compléments",
+  "recommendationDetail": "Ne pas évaluer contre un siège CODIR mais contre le mode Mission PMO (TJM + success fees). Pour une éval CODIR : demander 2-3 résultats chiffrés par mission et toute responsabilité directe à P&L.",
+  "analysisFilename": "matching_fabrice_thilliez_2026-06-18.json"
+}
