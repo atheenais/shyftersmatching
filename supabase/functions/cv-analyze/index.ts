@@ -259,11 +259,14 @@ serve(async (req) => {
     }
 
     const claudeData = await claudeRes.json();
-    const rawText: string = claudeData.content[0].text;
+    if (!Array.isArray(claudeData.content) || claudeData.content.length === 0) {
+      throw new Error("Réponse Claude vide ou format inattendu");
+    }
+    const rawText: string = claudeData.content[0].text ?? "";
 
     const match =
       rawText.match(/```json\s*([\s\S]*?)\s*```/) ||
-      rawText.match(/({[\s\S]*})/);
+      rawText.match(/(\{[\s\S]*\})(?=[^}]*$)/);
     if (!match) throw new Error("Aucun JSON dans la réponse Claude");
 
     analysis = JSON.parse(match[1]);
