@@ -57,59 +57,59 @@ E3 — Capacité d'intervention en management de transition / mandat social.
 E4 — ORIENTATION BUSINESS démontrée : les expériences passées doivent intégrer des notions de résultats et de performance d'entreprise (impact chiffré ou qualifié sur CA, marge, EBITDA, trésorerie, parts de marché, rentabilité, productivité…). Un CV purement descriptif des missions/responsabilités, sans lien explicite avec la performance, est éliminé — quel que soit le niveau hiérarchique atteint.
 
 ## CRITÈRES SPÉCIFIQUES PAR RÔLE
+Pour chaque rôle, les 4 labels `roleCriteria` à utiliser sont fixés ci-dessous (≤ 30 caractères chacun).
+La `note` doit rester courte (≤ 40 caractères) : preuve chiffrée tirée du CV, ou "Non mentionné", "À objectiver", "Absent du CV".
 
-1. Directeur Général
-   - Expérience de DG / CEO / Country Manager d'une entité ≥ 20 M€ CA
-   - Responsabilité P&L complet démontrée
-   - Track record sur ≥ 1 cycle de transformation (retournement, scale ou M&A)
-   - KPIs attendus : CA, EBITDA, free cash flow, valorisation
+1. Directeur Général — roleLabel: "DG"
+   label[0]: "DG d'entité ≥ 20 M€"          → CA de l'entité dirigée
+   label[1]: "Responsabilité P&L complet"     → P&L démontré ou non
+   label[2]: "≥1 cycle de transformation"     → retournement / scale / M&A
+   label[3]: "KPIs EBITDA / FCF / valo"       → KPIs financiers chiffrés
 
-2. Directeur Marketing Digital
-   - Direction marketing en environnement retail/e-commerce/DNVB
-   - Maîtrise acquisition (SEO/SEA/social), CRM, CAC/LTV, brand equity
-   - Expérience d'au moins une transformation omnicanale ou DNVB → retail
-   - KPIs attendus : CAC, LTV, taux de conversion, ROAS, notoriété
+2. Directeur Marketing Digital — roleLabel: "DMD"
+   label[0]: "Direction mktg digital ≥ 5 ans" → durée en responsabilité marketing
+   label[1]: "Budget mktg ≥ 1 M€"             → budget géré chiffré
+   label[2]: "Acquisition / CRM / data"        → canaux maîtrisés
+   label[3]: "KPIs CAC / LTV / ROAS"           → KPIs performance présents
 
-3. Directeur Commercial
-   - Direction commerciale (retail/B2B/B2C) avec équipe ≥ 20 personnes
-   - Pilotage réseau magasins ou force de vente / partenaires
-   - Expérience pricing, animation commerciale, comptes clés
-   - KPIs attendus : CA, marge, CA/m², taux de transformation, panier moyen
+3. Directeur Commercial — roleLabel: "DCOM"
+   label[0]: "CA géré ≥ 10 M€"               → CA ou réseau piloté
+   label[1]: "Management équipe ≥ 20 pers"    → taille équipe commerciale
+   label[2]: "Négociation grands comptes"      → comptes clés / partenaires
+   label[3]: "KPIs CA / marge / CA/m²"        → KPIs performance présents
 
-4. Directeur Value Chain
-   - Direction supply chain / opérations / industriel
-   - Maîtrise S&OP, achats, logistique, stocks, BFR opérationnel
-   - Expérience d'industrialisation/scale ou de restructuration opérationnelle
-   - KPIs attendus : taux de service, BFR, productivité, coût logistique/CA
+4. Directeur Value Chain — roleLabel: "DVC"
+   label[0]: "Direction SC / opérations"       → périmètre supply chain
+   label[1]: "S&OP / achats / logistique"      → domaines couverts
+   label[2]: "Transfo opérationnelle"           → lean / ERP / scale documenté
+   label[3]: "KPIs OTD / BFR / coûts"          → KPIs opérationnels présents
 
-5. Directeur Finance et Juridique
-   - DAF/CFO d'une entité ≥ 20 M€ CA, idéalement contexte LBO/M&A
-   - Maîtrise restructuring financier, négociation créanciers, levée de fonds
-   - Pilotage cash 13 semaines, trésorerie, covenants bancaires
-   - KPIs attendus : EBITDA, FCF, BFR, dette nette, multiples
-   - Volet juridique : droit des affaires/corporate (PAS le droit social seul)
+5. Directeur Finance et Juridique — roleLabel: "DFJ"
+   label[0]: "DAF/CFO entité ≥ 20 M€"         → périmètre financier
+   label[1]: "Restructuring / levée fonds"     → opérations financières
+   label[2]: "Cash 13 sem. / covenants"        → pilotage trésorerie
+   label[3]: "KPIs EBITDA / FCF / BFR"         → KPIs financiers présents
 
-6. Directeur Ressources Humaines
-   - DRH d'une entité ≥ 200 personnes, idéalement multi-sites/retail
-   - Pilotage masse salariale, GPEC, relations sociales/CSE
-   - Expérience d'au moins une transformation RH (PSE, intégration M&A, scale)
-   - KPIs attendus : masse salariale/CA, turnover, attrition, eNPS, productivité
-   - Bonus : double compétence droit social
+6. Directeur Ressources Humaines — roleLabel: "DRH"
+   label[0]: "DRH d'entité ≥ 200 pers"        → périmètre RH
+   label[1]: "Masse salariale / GPEC / CSE"    → domaines RH couverts
+   label[2]: "Transfo RH (PSE, M&A, scale)"   → transformation documentée
+   label[3]: "KPIs MS/CA, turnover, eNPS"      → KPIs RH présents
 
-7. Directeur Systèmes d'Information
-   - DSI/CTO d'une entité ≥ 20 M€ CA
-   - Expérience ERP, e-commerce, OMS, data platform, cybersécurité
-   - Cas d'usage IA opérationnels déployés (différenciateur Shyfters)
-   - KPIs attendus : disponibilité, % budget IT/CA, ROI projets, time-to-market
+7. Directeur Systèmes d'Information — roleLabel: "DSI"
+   label[0]: "DSI/CTO entité ≥ 20 M€"         → périmètre SI
+   label[1]: "ERP / e-com / OMS / data"        → domaines SI couverts
+   label[2]: "Cas d'usage IA déployés"         → IA opérationnelle (différenciateur)
+   label[3]: "KPIs dispo / ROI / TTM"          → KPIs SI présents
 
 ## USE CASES SHYFTERS (cocher uniquement ceux documentés dans le CV)
 
 UC1 — Retournement : restructuring, procédures collectives, négociation créanciers, plan EBITDA, cash 13 semaines, PSE
-UC2 — Scale rentable : hypercroissance, industrialisation, ouverture de sites, structuration post-pilote
+UC2 — Scale : hypercroissance, industrialisation, ouverture de sites, structuration post-pilote
 UC3 — Build-up/M&A : thèse d'investissement, due diligence, intégration post-fusion, LBO, fonds PE
-UC4 — DNVB → omnicanal : DTC, e-commerce natif, ouverture retail, C&C, ship-from-store, CA/m²
+UC4 — DNVB/omnicanal : DTC, e-commerce natif, ouverture retail, C&C, ship-from-store, CA/m²
 UC5 — Implantation France : entrée de marque étrangère, set-up filiale, go-to-market, distribution
-UC6 — Board member / accompagnement DG : gouvernance, CA, sparring partner actionnaire, comités
+UC6 — Board/DG : gouvernance, CA, sparring partner actionnaire, comités
 
 ## RÈGLE DE SCORING OFFICIELLE
 
@@ -149,7 +149,7 @@ Dans recommendationDetail, signale explicitement si des informations essentielle
   "role": "Directeur Général",
   "useCases": [
     { "label": "UC1 — Retournement",        "active": false },
-    { "label": "UC2 — Scale rentable",      "active": false },
+    { "label": "UC2 — Scale",               "active": false },
     { "label": "UC3 — Build-up/M&A",        "active": false },
     { "label": "UC4 — DNVB/omnicanal",      "active": false },
     { "label": "UC5 — Implantation France", "active": false },
@@ -157,7 +157,7 @@ Dans recommendationDetail, signale explicitement si des informations essentielle
   ],
   "eliminatoires": [
     { "status": "valid",   "title": "E1 — Position CODIR",           "proof": "preuve tirée du CV" },
-    { "status": "valid",   "title": "E2 — Expérience ~10 ans+",      "proof": "durée et contexte" },
+    { "status": "valid",   "title": "E2 — Expérience 10 ans+",       "proof": "durée et contexte" },
     { "status": "partial", "title": "E3 — Management de transition", "proof": "explication nuancée" },
     { "status": "invalid", "title": "E4 — Orientation business",     "proof": "ce qui manque" }
   ],
@@ -177,8 +177,8 @@ Dans recommendationDetail, signale explicitement si des informations essentielle
     "Gap 1 — factuel, ancré dans les critères Shyfters",
     "Gap 2"
   ],
-  "recommendation": "Fort match",
-  "recommendationDetail": "Synthèse 2-3 phrases : décision, prochaines étapes, et signalement explicite de tout KPI ou périmètre absent du CV qui nécessiterait vérification."
+  "recommendation": "Entretien immédiat / Demande de compléments / Rejet",
+  "recommendationDetail": "Synthèse 2-3 phrases : décision, prochaines étapes, et signalement explicite de tout KPI ou périmètre absent du CV qui nécessiterait vérification en entretien."
 }
 \`\`\`
 
@@ -294,7 +294,7 @@ serve(async (req) => {
       score_global:      typeof analysis.score === "number" ? analysis.score : null,
       recommandation:    String(analysis.verdict || "non-match"),
       synthese:          String(analysis.recommendationDetail || ""),
-      detail_grille:     analysis,
+      detail_grille:     { ...analysis, analysisFilename: filename },
       analysis_filename: filename,
       auteur_id:         user.id,
     })
