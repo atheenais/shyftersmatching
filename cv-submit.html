@@ -116,7 +116,7 @@
     <div class="list-header" style="margin-bottom:24px">
       <div>
         <div class="list-title">Analyser un CV</div>
-        <div class="list-meta">Pré-analyse automatique — protocole Shyfters v80526 · sans enrichissement web</div>
+        <div class="list-meta">Importer un fichier PDF, Word ou texte — ou coller directement le CV</div>
       </div>
     </div>
 
@@ -129,11 +129,11 @@
 
       <!-- Drop zone -->
       <div class="drop-zone" id="dropZone">
-        <input type="file" id="fileInput" accept=".txt,.pdf,.PDF">
+        <input type="file" id="fileInput" accept=".txt,.pdf,.PDF,.doc,.docx">
         <div class="drop-icon">📄</div>
         <div class="drop-label">
           <strong>Cliquer pour importer</strong> ou glisser-déposer<br>
-          <span style="font-size:12px">Formats acceptés : .pdf · .txt</span>
+          <span style="font-size:12px">Formats acceptés : .pdf · .docx · .txt</span>
         </div>
       </div>
 
@@ -186,6 +186,7 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js?v=3"></script>
 <script src="auth.js?v=3"></script>
@@ -265,9 +266,10 @@
   async function handleFile(file) {
     if (!file) return;
     const name = file.name.toLowerCase();
+    const dropLabel = dropZone.querySelector('.drop-label');
+    const origLabel = dropLabel.innerHTML;
+
     if (name.endsWith('.pdf')) {
-      const dropLabel = dropZone.querySelector('.drop-label');
-      const orig = dropLabel.innerHTML;
       dropLabel.innerHTML = '<span style="color:var(--accent)">Extraction du PDF…</span>';
       try {
         const text = await extractPdfText(file);
@@ -277,14 +279,27 @@
       } catch (e) {
         showAlert(`Impossible de lire ce PDF : ${e.message}. Essayez de copier-coller le texte manuellement.`);
       } finally {
-        dropLabel.innerHTML = orig;
+        dropLabel.innerHTML = origLabel;
+      }
+    } else if (name.endsWith('.docx') || name.endsWith('.doc')) {
+      dropLabel.innerHTML = '<span style="color:var(--accent)">Extraction du document Word…</span>';
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        if (!result.value.trim()) throw new Error('Document vide ou format non lisible');
+        loadText(result.value);
+        showToast('Document Word extrait avec succès', 'success');
+      } catch (e) {
+        showAlert(`Impossible de lire ce fichier Word : ${e.message}. Essayez d'exporter en PDF ou de copier-coller le texte.`);
+      } finally {
+        dropLabel.innerHTML = origLabel;
       }
     } else if (name.endsWith('.txt')) {
       const reader = new FileReader();
       reader.onload = e => loadText(e.target.result);
       reader.readAsText(file, 'utf-8');
     } else {
-      showAlert('Format non pris en charge. Utilisez un fichier .pdf ou .txt.');
+      showAlert('Format non pris en charge. Utilisez un fichier .pdf, .docx ou .txt.');
     }
     fileInput.value = '';
   }
