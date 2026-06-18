@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shyfters Matching — Analyser un CV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css?v=3">
+  <style>
+    .submit-wrap { max-width: 720px; margin: 0 auto; }
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 32px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+    .drop-zone:hover,
+    .drop-zone.drag-over { border-color: var(--accent); background: rgba(0,207,255,.04); }
+    .drop-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .drop-icon { font-size: 32px; margin-bottom: 8px; }
+    .drop-label { font-size: 14px; color: var(--muted); }
+    .drop-label strong { color: var(--accent); }
+
+    .or-separator {
+      display: flex; align-items: center; gap: 12px;
+      color: var(--muted); font-size: 12px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin: 16px 0;
+    }
+    .or-separator::before, .or-separator::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    .form-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+    .form-section-title {
+      font-size: 13px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.6px; color: var(--muted);
+      margin-bottom: 20px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    textarea#cvText {
+      min-height: 280px;
+      resize: vertical;
+      font-size: 13px;
+      font-family: var(--font);
+      line-height: 1.5;
+    }
+
+    .char-count {
+      text-align: right; font-size: 11px; color: var(--muted);
+      margin-top: 4px;
+    }
+    .char-count.warn { color: var(--warn); }
+
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .progress-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .progress-text { font-size: 14px; color: var(--text); }
+    .progress-sub  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .form-row { display: flex; gap: 16px; }
+    .form-row .form-group { flex: 1; }
+
+    @media (max-width: 600px) {
+      .form-section { padding: 18px 16px; }
+      .form-row { flex-direction: column; gap: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <a href="list.html"><img src="logo.png?v=3" alt="Shyfters" class="brand-logo"></a>
+  </div>
+  <div class="topbar-right">
+    <a href="list.html" class="btn btn-ghost btn-sm">← Rapports</a>
+    <span class="user-badge" id="userEmail">—</span>
+    <button class="btn btn-ghost btn-sm" id="logoutBtn">Déconnexion</button>
+  </div>
+</header>
+
+<main class="page-inner">
+  <div class="submit-wrap">
+
+    <div class="list-header" style="margin-bottom:24px">
+      <div>
+        <div class="list-title">Analyser un CV</div>
+        <div class="list-meta">Coller le texte du CV ou importer un fichier .txt</div>
+      </div>
+    </div>
+
+    <!-- Alerte -->
+    <div class="alert alert-error" id="alertBox"></div>
+
+    <!-- Section 1 : CV -->
+    <div class="form-section">
+      <div class="form-section-title">Contenu du CV</div>
+
+      <!-- Drop zone -->
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept=".txt,.pdf">
+        <div class="drop-icon">📄</div>
+        <div class="drop-label">
+          <strong>Cliquer pour importer</strong> ou glisser-déposer un fichier .txt<br>
+          <span style="font-size:12px">(Pour un PDF, copiez-collez le texte ci-dessous)</span>
+        </div>
+      </div>
+
+      <div class="or-separator">ou</div>
+
+      <div class="form-group" style="margin-bottom:0">
+        <label for="cvText">Texte du CV</label>
+        <textarea id="cvText" placeholder="Coller ici le texte du CV…"></textarea>
+        <div class="char-count" id="charCount">0 caractères</div>
+      </div>
+    </div>
+
+    <!-- Section 2 : Paramètres -->
+    <div class="form-section">
+      <div class="form-section-title">Paramètres (optionnels)</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="posteVise">Rôle CODIR cible</label>
+          <select id="posteVise">
+            <option value="">Auto-détection</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="clientName">Client</label>
+          <input type="text" id="clientName" placeholder="Société recherchant le profil">
+        </div>
+      </div>
+    </div>
+
+    <!-- Progression (caché par défaut) -->
+    <div class="progress-block" id="progressBlock" hidden>
+      <div class="spinner"></div>
+      <div>
+        <div class="progress-text" id="progressText">Analyse en cours…</div>
+        <div class="progress-sub">Claude analyse le CV selon la grille Shyfters CODIR</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions" style="display:flex;gap:10px;justify-content:flex-end">
+      <a href="list.html" class="btn btn-ghost">Annuler</a>
+      <button class="btn btn-primary" id="submitBtn" style="width:auto;min-width:160px">
+        Lancer l'analyse
+      </button>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js?v=3"></script>
+<script src="auth.js?v=3"></script>
+<script>
+(async () => {
+  const session = await requireAuth();
+  if (!session) return;
+
+  document.getElementById('userEmail').textContent = session.user.email;
+  document.getElementById('logoutBtn').addEventListener('click', signOut);
+
+  // ── Popule le select rôle ──
+  const posteSelect = document.getElementById('posteVise');
+  ROLES_VALIDES.forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = opt.textContent = r;
+    posteSelect.appendChild(opt);
+  });
+
+  // ── Toast ──
+  function showToast(msg, type = 'info', duration = 4000) {
+    const box = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast toast-${type}`;
+    t.textContent = msg;
+    box.appendChild(t);
+    setTimeout(() => t.remove(), duration);
+  }
+
+  // ── Alerte ──
+  function showAlert(msg) {
+    const el = document.getElementById('alertBox');
+    el.textContent = msg;
+    el.classList.add('show');
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  function hideAlert() {
+    const el = document.getElementById('alertBox');
+    el.classList.remove('show');
+  }
+
+  // ── Zone de dépôt ──
+  const dropZone   = document.getElementById('dropZone');
+  const fileInput  = document.getElementById('fileInput');
+  const cvText     = document.getElementById('cvText');
+  const charCount  = document.getElementById('charCount');
+
+  function updateCharCount() {
+    const n = cvText.value.length;
+    charCount.textContent = `${n.toLocaleString('fr-FR')} caractère${n > 1 ? 's' : ''}`;
+    charCount.className = 'char-count' + (n > 60000 ? ' warn' : '');
+  }
+  cvText.addEventListener('input', updateCharCount);
+
+  function loadText(text) {
+    cvText.value = text;
+    updateCharCount();
+    cvText.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    if (!file.name.endsWith('.txt')) {
+      showAlert('Seuls les fichiers .txt sont pris en charge. Pour un PDF, copiez-collez le texte.');
+      fileInput.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => loadText(e.target.result);
+    reader.readAsText(file, 'utf-8');
+  });
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    if (!file.name.endsWith('.txt')) {
+      showAlert('Seuls les fichiers .txt sont pris en charge. Pour un PDF, copiez-collez le texte.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = ev => loadText(ev.target.result);
+    reader.readAsText(file, 'utf-8');
+  });
+
+  // ── Soumission ──
+  const submitBtn     = document.getElementById('submitBtn');
+  const progressBlock = document.getElementById('progressBlock');
+  const progressText  = document.getElementById('progressText');
+
+  const EDGE_URL = `${SUPABASE_URL}/functions/v1/cv-analyze`;
+
+  submitBtn.addEventListener('click', async () => {
+    hideAlert();
+    const text = cvText.value.trim();
+    if (!text) {
+      showAlert('Veuillez coller le texte du CV ou importer un fichier .txt.');
+      return;
+    }
+    if (text.length < 200) {
+      showAlert('Le texte semble trop court pour un CV (moins de 200 caractères).');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    progressBlock.hidden = false;
+    progressText.textContent = 'Envoi du CV à Claude…';
+
+    let stepIndex = 0;
+    const steps = [
+      'Envoi du CV à Claude…',
+      'Analyse des critères éliminatoires…',
+      'Évaluation de la grille CODIR…',
+      'Calcul du score et du verdict…',
+      'Finalisation du rapport…',
+    ];
+    const stepInterval = setInterval(() => {
+      stepIndex = Math.min(stepIndex + 1, steps.length - 1);
+      progressText.textContent = steps[stepIndex];
+    }, 8000);
+
+    try {
+      const res = await fetch(EDGE_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          cv_text:    text,
+          poste_vise: posteSelect.value || null,
+          client_name: document.getElementById('clientName').value.trim() || null,
+        }),
+      });
+
+      clearInterval(stepInterval);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || `Erreur ${res.status}`);
+      }
+
+      showToast(`✓ Rapport créé pour ${data.candidat_nom}`, 'success', 3000);
+      setTimeout(() => { window.location.href = `rapport.html?id=${data.id}`; }, 800);
+
+    } catch (e) {
+      clearInterval(stepInterval);
+      submitBtn.disabled = false;
+      progressBlock.hidden = true;
+      showAlert(`Erreur : ${e.message}`);
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
