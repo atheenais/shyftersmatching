@@ -1,0 +1,48 @@
+{
+  "name": "Mélissa Mabire",
+  "initials": "MM",
+  "title": "Présidente & Fondatrice · Manager de transition",
+  "employer": "Chrysalides · depuis 2018",
+  "experience": "20+ ans d'expérience",
+  "analysisDate": "18 juin 2026",
+  "score": 84,
+  "verdict": "fort",
+  "role": "Directeur Commercial / Transformation retail",
+  "useCases": [
+    { "label": "UC1 — Retournement", "active": true },
+    { "label": "UC2 — Scale", "active": false },
+    { "label": "UC3 — Build-up/M&A", "active": false },
+    { "label": "UC4 — DNVB/omnicanal", "active": true },
+    { "label": "UC5 — Implantation France", "active": false },
+    { "label": "UC6 — Board/DG", "active": true }
+  ],
+  "eliminatoires": [
+    { "status": "valid", "title": "E1 — Position CODIR", "proof": "Présidente Chrysalides · membre CODIR TAO (transition)" },
+    { "status": "valid", "title": "E2 — Expérience 20 ans+", "proof": "2004→2026 · direction depuis 2010 (zone 75 M€)" },
+    { "status": "valid", "title": "E3 — Management de transition", "proof": "Manager de transition TAO 24-25 · Pays Belgique transition" },
+    { "status": "valid", "title": "E4 — Orientation business", "proof": "ROI Lean +1 M€ (+8 % CA) · retournement TAO déclaré" }
+  ],
+  "roleLabel": "Dir. Commercial",
+  "roleCriteria": [
+    { "status": "valid", "label": "Réseau / équipe ≥ 20 pers.", "note": "280 mag. · 425 collab. · 8 DR" },
+    { "status": "valid", "label": "Pilotage réseau magasins", "note": "Succursaliste & affilié, multi-pays" },
+    { "status": "partial", "label": "Animation comm. / pricing", "note": "Animation ✓ · pricing n.c." },
+    { "status": "partial", "label": "KPIs CA / marge / CA-m²", "note": "CA & rentab. ✓ · CA/m² n.c." }
+  ],
+  "strengths": [
+    "ADN retail / phygital / omnicanal — cœur de cible Shyfters (RFID, mobile vendeur, C&C, Ship from Store)",
+    "Management de transition CODIR avéré en contexte de retournement (TAO, enseigne 230 M€)",
+    "Track record chiffré : ROI Lean McKinsey +1 M€ / +8 % CA · zone 75 M€ / 105 mag.",
+    "Profil dirigeant-entrepreneur : fondatrice de cabinet + gouvernance holding multi-sociétés",
+    "Conduite du changement à grande échelle et multi-pays (jusqu'à 850 points de vente)"
+  ],
+  "gaps": [
+    "Pas de P&L complet ≥ 20 M€ piloté en propre (Chrysalides ≈ 2,8 M€) — rôle DG à confirmer",
+    "Volet finance / restructuring / LBO / M&A non démontré",
+    "Chiffres de la mission TAO 2024-25 auto-déclarés, non vérifiables publiquement",
+    "Marketing digital « acquisition » (CAC / LTV / ROAS / SEA) peu présent — digital = retail-tech/omnicanal"
+  ],
+  "recommendation": "Entretien",
+  "recommendationDetail": "Profil très aligné sur le cœur de cible Shyfters (retail / phygital / transition). Valider en entretien les KPIs réels de la mission TAO 2024-25, le périmètre P&L piloté, et la profondeur pricing / comptes clés.",
+  "analysisFilename": "matching_melissa_mabire_2026-06-18.json"
+}
