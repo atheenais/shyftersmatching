@@ -129,11 +129,11 @@
 
       <!-- Drop zone -->
       <div class="drop-zone" id="dropZone">
-        <input type="file" id="fileInput" accept=".txt,.pdf">
+        <input type="file" id="fileInput" accept=".txt,.pdf,.PDF">
         <div class="drop-icon">📄</div>
         <div class="drop-label">
-          <strong>Cliquer pour importer</strong> ou glisser-déposer un fichier .txt<br>
-          <span style="font-size:12px">(Pour un PDF, copiez-collez le texte ci-dessous)</span>
+          <strong>Cliquer pour importer</strong> ou glisser-déposer<br>
+          <span style="font-size:12px">Formats acceptés : .pdf · .txt</span>
         </div>
       </div>
 
@@ -185,6 +185,7 @@
 
 <div class="toast-container" id="toastContainer"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js?v=3"></script>
 <script src="auth.js?v=3"></script>
@@ -226,6 +227,22 @@
     el.classList.remove('show');
   }
 
+  // ── pdf.js ──
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+
+  async function extractPdfText(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const pages = [];
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      pages.push(content.items.map(item => item.str).join(' '));
+    }
+    return pages.join('\n');
+  }
+
   // ── Zone de dépôt ──
   const dropZone   = document.getElementById('dropZone');
   const fileInput  = document.getElementById('fileInput');
@@ -245,33 +262,41 @@
     cvText.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  fileInput.addEventListener('change', () => {
-    const file = fileInput.files[0];
+  async function handleFile(file) {
     if (!file) return;
-    if (!file.name.endsWith('.txt')) {
-      showAlert('Seuls les fichiers .txt sont pris en charge. Pour un PDF, copiez-collez le texte.');
-      fileInput.value = '';
-      return;
+    const name = file.name.toLowerCase();
+    if (name.endsWith('.pdf')) {
+      const dropLabel = dropZone.querySelector('.drop-label');
+      const orig = dropLabel.innerHTML;
+      dropLabel.innerHTML = '<span style="color:var(--accent)">Extraction du PDF…</span>';
+      try {
+        const text = await extractPdfText(file);
+        if (!text.trim()) throw new Error('PDF vide ou non lisible (PDF scanné ?)');
+        loadText(text);
+        showToast('PDF extrait avec succès', 'success');
+      } catch (e) {
+        showAlert(`Impossible de lire ce PDF : ${e.message}. Essayez de copier-coller le texte manuellement.`);
+      } finally {
+        dropLabel.innerHTML = orig;
+      }
+    } else if (name.endsWith('.txt')) {
+      const reader = new FileReader();
+      reader.onload = e => loadText(e.target.result);
+      reader.readAsText(file, 'utf-8');
+    } else {
+      showAlert('Format non pris en charge. Utilisez un fichier .pdf ou .txt.');
     }
-    const reader = new FileReader();
-    reader.onload = e => loadText(e.target.result);
-    reader.readAsText(file, 'utf-8');
-  });
+    fileInput.value = '';
+  }
+
+  fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
 
   dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
   dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
   dropZone.addEventListener('drop', e => {
     e.preventDefault();
     dropZone.classList.remove('drag-over');
-    const file = e.dataTransfer.files[0];
-    if (!file) return;
-    if (!file.name.endsWith('.txt')) {
-      showAlert('Seuls les fichiers .txt sont pris en charge. Pour un PDF, copiez-collez le texte.');
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = ev => loadText(ev.target.result);
-    reader.readAsText(file, 'utf-8');
+    handleFile(e.dataTransfer.files[0]);
   });
 
   // ── Soumission ──
