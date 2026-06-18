@@ -1,0 +1,48 @@
+{
+  "name": "Emmanuel Bourgeois",
+  "initials": "EB",
+  "title": "Président / DG — restructuring & M&A",
+  "employer": "Ducatillon Nature SAS · Admin. Réseau Entreprendre Nord",
+  "experience": "~37 ans d'expérience",
+  "analysisDate": "18 juin 2026",
+  "score": 92,
+  "verdict": "fort",
+  "role": "Directeur Général",
+  "useCases": [
+    { "label": "UC1 — Retournement", "active": true },
+    { "label": "UC2 — Scale", "active": false },
+    { "label": "UC3 — Build-up/M&A", "active": true },
+    { "label": "UC4 — DNVB/omnicanal", "active": true },
+    { "label": "UC5 — Implantation France", "active": false },
+    { "label": "UC6 — Board/DG", "active": true }
+  ],
+  "eliminatoires": [
+    { "status": "valid", "title": "E1 — Position CODIR", "proof": "DG/Président mandat social (Ducatillon, Printemps, Devianne)" },
+    { "status": "valid", "title": "E2 — Expérience 10 ans+", "proof": "~37 ans, majorité en direction d'entité" },
+    { "status": "valid", "title": "E3 — Management de transition", "proof": "Mandats sociaux successifs, board, restructuring" },
+    { "status": "valid", "title": "E4 — Orientation business", "proof": "Coûts -50%, +20% CA, rentabilité 9%, NPS 66, 90% emplois sauvés" }
+  ],
+  "roleLabel": "Directeur Général",
+  "roleCriteria": [
+    { "status": "valid", "label": "DG d'entité ≥ 20 M€", "note": "28–120 M€" },
+    { "status": "valid", "label": "Responsabilité P&L complet", "note": "Turnarounds" },
+    { "status": "valid", "label": "≥1 cycle de transformation", "note": "RJ + M&A" },
+    { "status": "partial", "label": "KPIs EBITDA / FCF / valo", "note": "À objectiver" }
+  ],
+  "strengths": [
+    "Couvre 4 use cases sur 6, dont les 2 différenciants Shyfters",
+    "Procédure collective menée de bout en bout — 90% des emplois maintenus",
+    "Opération M&A en environnement LBO (banques d'affaires, VDD, fonds PE)",
+    "Ancrage retail/e-commerce/omnicanal + appétence transformation digitale & IA",
+    "Réseau territorial dense (Réseau Entreprendre Nord, CCI Lille)"
+  ],
+  "gaps": [
+    "KPIs financiers fins (EBITDA, FCF, dette nette) à expliciter",
+    "Anglais « technique » seulement — limite missions internationales",
+    "Volet juridique = procédures collectives, pas corporate/M&A pur",
+    "Pas d'UC5 ni de scale-up hypercroissance documentée"
+  ],
+  "recommendation": "Cas particulier — associé fondateur",
+  "recommendationDetail": "Emmanuel Bourgeois est associé fondateur de Shyfters : le matching valide la cohérence du référentiel, non un recrutement. À profil externe équivalent : entretien immédiat, avec objectivation des KPIs financiers chiffrés.",
+  "analysisFilename": "matching_emmanuel_bourgeois_2026-06-18.json"
+}
