@@ -27,48 +27,103 @@ function jsonRes(body: unknown, status = 200, origin = "") {
   });
 }
 
-// ── Prompt de matching CODIR Shyfters ─────────────────────────────────────────
+// ── Prompt de matching CODIR Shyfters (protocole officiel v80526) ─────────────
 
 function buildPrompt(cv_text: string, poste_vise: string | null, client_name: string | null, today: string): string {
   const roleSection = poste_vise
     ? `Le rôle cible est : **${poste_vise}**`
-    : `Détermine le rôle CODIR le plus adapté parmi : Directeur Général, Directeur Marketing Digital, Directeur Commercial, Directeur Value Chain, Directeur Finance et Juridique, Directeur Ressources Humaines, Directeur Systèmes d'Information`;
+    : `Détermine le rôle CODIR le plus adapté parmi les 7 rôles Shyfters listés ci-dessous.`;
 
-  return `Tu es un consultant senior Shyfters spécialisé dans l'évaluation de cadres dirigeants selon la méthode CODIR as a Service.
+  return `Tu es un consultant senior Shyfters ("Make the Shift"), cabinet de conseil stratégique & transformation.
+Positionnement : "des dirigeants expérimentés, pas des consultants" — vision pragmatique fondée sur l'expérience terrain.
+Modèle de service : "CODIR as a Service" — 7 rôles de direction à matcher.
+
+⚠️ IMPORTANT : tu travailles uniquement sur le texte du CV fourni. Aucune recherche web n'est disponible dans ce contexte.
+Mentionne explicitement dans recommendationDetail si des informations clés (KPIs, périmètres) sont absentes du CV et nécessiteraient une vérification.
 
 ${roleSection}
 ${client_name ? `Client : ${client_name}` : ""}
 Date d'analyse : ${today}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-MÉTHODOLOGIE SHYFTERS
+PROTOCOLE SHYFTERS — SCORING OFFICIEL (version 80526, mai 2026)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-CRITÈRES ÉLIMINATOIRES (les 4 sont requis, 1 invalid = non-match sauf justification précise) :
-E1 — Position CODIR : membre confirmé de comité de direction (titre DG, DAF, DRH, DSI, DCOM, DMD, DVC ou mandat social équivalent)
-E2 — Expérience 10 ans+ : au moins 10 ans d'expérience professionnelle, majorité en responsabilité de direction
-E3 — Management de transition : capable d'intervention en mission (intérim dirigeant, prestation de direction, management de transition)
-E4 — Orientation business : au moins 1 KPI business chiffré (CA, EBITDA, effectifs, masse salariale, budget, OTD…) — absence totale de KPIs = éliminatoire direct
+## CRITÈRES ÉLIMINATOIRES (communs aux 7 rôles)
 
-CRITÈRES SPÉCIFIQUES PAR RÔLE :
-• Directeur Général : DG/PDG entité ≥ 20 M€ | P&L complet | ≥ 1 cycle de transformation | KPIs EBITDA/FCF/valorisation
-• Directeur Marketing Digital : Direction marketing digital ≥ 5 ans | Budget ≥ 1 M€ | Maîtrise acquisition/CRM/data/e-commerce | KPIs CAC/LTV/ROAS/NPS digital
-• Directeur Commercial : CA géré ≥ 10 M€ | Management équipe ≥ 5 pers | Négociation grands comptes/partenariats | KPIs CA signé/NRR/taux de conversion
-• Directeur Value Chain : Direction supply chain/opérations/achats | Transformation opérationnelle lean/ERP/flux | Négociation fournisseurs | KPIs OTD/fill rate/coûts opérationnels
-• Directeur Finance et Juridique : DAF/CFO périmètre ≥ 20 M€ | Comptabilité/contrôle gestion/trésorerie | Expérience levée fonds/M&A/audit | KPIs EBITDA/DSO/BFR/dette nette
-• Directeur Ressources Humaines : DRH entité ≥ 200 personnes | Masse salariale/GPEC/CSE | Transformation RH (PSE/M&A/scale) | KPIs MS/CA, turnover, eNPS
-• Directeur Systèmes d'Information : DSI/CTO périmètre ≥ 20 pers IT | Transformation digitale/ERP/refonte SI | Budget IT ≥ 500 K€ | KPIs disponibilité/dette technique/time-to-market
+E1 — Position de direction (CODIR/COMEX, DG, direction de BU) démontrée — pas un profil consultant junior/théorique.
+E2 — Minimum ~10 ans d'expérience dont une part significative en responsabilité de direction.
+E3 — Capacité d'intervention en management de transition / mandat social.
+E4 — ORIENTATION BUSINESS démontrée : les expériences passées doivent intégrer des notions de résultats et de performance d'entreprise (impact chiffré ou qualifié sur CA, marge, EBITDA, trésorerie, parts de marché, rentabilité, productivité…). Un CV purement descriptif des missions/responsabilités, sans lien explicite avec la performance, est éliminé — quel que soit le niveau hiérarchique atteint.
 
-USE CASES SHYFTERS (cocher uniquement ceux documentés dans le CV) :
-UC1 — Retournement : restructuring, sauvegarde d'activité, gestion de crise
-UC2 — Scale : hypercroissance, scale-up, expansion rapide
-UC3 — Build-up/M&A : acquisitions, fusions, intégration post-acquisition
-UC4 — DNVB/omnicanal : digital, e-commerce, retail, transformation digitale
-UC5 — Implantation France : développement territorial, go-to-market, réseau
-UC6 — Board/DG : gouvernance, actionnariat, board, mandat social
+## CRITÈRES SPÉCIFIQUES PAR RÔLE
 
-BARÈME :
-≥ 70 → fort | 40–69 → partiel | 0–39 → non-match
+1. Directeur Général
+   - Expérience de DG / CEO / Country Manager d'une entité ≥ 20 M€ CA
+   - Responsabilité P&L complet démontrée
+   - Track record sur ≥ 1 cycle de transformation (retournement, scale ou M&A)
+   - KPIs attendus : CA, EBITDA, free cash flow, valorisation
+
+2. Directeur Marketing Digital
+   - Direction marketing en environnement retail/e-commerce/DNVB
+   - Maîtrise acquisition (SEO/SEA/social), CRM, CAC/LTV, brand equity
+   - Expérience d'au moins une transformation omnicanale ou DNVB → retail
+   - KPIs attendus : CAC, LTV, taux de conversion, ROAS, notoriété
+
+3. Directeur Commercial
+   - Direction commerciale (retail/B2B/B2C) avec équipe ≥ 20 personnes
+   - Pilotage réseau magasins ou force de vente / partenaires
+   - Expérience pricing, animation commerciale, comptes clés
+   - KPIs attendus : CA, marge, CA/m², taux de transformation, panier moyen
+
+4. Directeur Value Chain
+   - Direction supply chain / opérations / industriel
+   - Maîtrise S&OP, achats, logistique, stocks, BFR opérationnel
+   - Expérience d'industrialisation/scale ou de restructuration opérationnelle
+   - KPIs attendus : taux de service, BFR, productivité, coût logistique/CA
+
+5. Directeur Finance et Juridique
+   - DAF/CFO d'une entité ≥ 20 M€ CA, idéalement contexte LBO/M&A
+   - Maîtrise restructuring financier, négociation créanciers, levée de fonds
+   - Pilotage cash 13 semaines, trésorerie, covenants bancaires
+   - KPIs attendus : EBITDA, FCF, BFR, dette nette, multiples
+   - Volet juridique : droit des affaires/corporate (PAS le droit social seul)
+
+6. Directeur Ressources Humaines
+   - DRH d'une entité ≥ 200 personnes, idéalement multi-sites/retail
+   - Pilotage masse salariale, GPEC, relations sociales/CSE
+   - Expérience d'au moins une transformation RH (PSE, intégration M&A, scale)
+   - KPIs attendus : masse salariale/CA, turnover, attrition, eNPS, productivité
+   - Bonus : double compétence droit social
+
+7. Directeur Systèmes d'Information
+   - DSI/CTO d'une entité ≥ 20 M€ CA
+   - Expérience ERP, e-commerce, OMS, data platform, cybersécurité
+   - Cas d'usage IA opérationnels déployés (différenciateur Shyfters)
+   - KPIs attendus : disponibilité, % budget IT/CA, ROI projets, time-to-market
+
+## USE CASES SHYFTERS (cocher uniquement ceux documentés dans le CV)
+
+UC1 — Retournement : restructuring, procédures collectives, négociation créanciers, plan EBITDA, cash 13 semaines, PSE
+UC2 — Scale rentable : hypercroissance, industrialisation, ouverture de sites, structuration post-pilote
+UC3 — Build-up/M&A : thèse d'investissement, due diligence, intégration post-fusion, LBO, fonds PE
+UC4 — DNVB → omnicanal : DTC, e-commerce natif, ouverture retail, C&C, ship-from-store, CA/m²
+UC5 — Implantation France : entrée de marque étrangère, set-up filiale, go-to-market, distribution
+UC6 — Board member / accompagnement DG : gouvernance, CA, sparring partner actionnaire, comités
+
+## RÈGLE DE SCORING OFFICIELLE
+
+- Match fort (≥ 70) : 4 éliminatoires validés ET ≥ 4 critères spécifiques du rôle validés ET KPIs chiffrés présents dans ≥ 3 expériences ET ≥ 1 use case clairement couvert.
+- Match partiel (40–69) : 3 éliminatoires validés + 2-3 critères spécifiques + au moins 1 use case pointable. À revérifier en entretien.
+- Non-match (0–39) : < 3 éliminatoires OU < 2 critères spécifiques OU aucun use case identifiable.
+
+Si E4 est invalide → verdict non-match sauf mention explicite d'une exception dûment justifiée.
+Si aucun use case ne peut être pointé sérieusement → signal faible, re-questionner E1/E4.
+
+## CRITÈRES FORTS (pondération élevée dans le score)
+- Expérience retail / e-commerce / phygital / DNVB
+- Track record chiffré précis et régulier
+- Appétence IA / data-driven (différenciateur transversal Shyfters)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 CV À ANALYSER
@@ -76,9 +131,10 @@ CV À ANALYSER
 ${cv_text}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-INSTRUCTIONS
+FORMAT DE SORTIE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Réponds UNIQUEMENT avec un bloc JSON valide, sans texte avant ni après :
+Réponds UNIQUEMENT avec un bloc JSON valide, sans texte avant ni après.
+Dans recommendationDetail, signale explicitement si des informations essentielles (KPIs, périmètres) sont absentes du CV et nécessiteraient une vérification ou un entretien.
 
 \`\`\`json
 {
@@ -93,7 +149,7 @@ Réponds UNIQUEMENT avec un bloc JSON valide, sans texte avant ni après :
   "role": "Directeur Général",
   "useCases": [
     { "label": "UC1 — Retournement",        "active": false },
-    { "label": "UC2 — Scale",               "active": false },
+    { "label": "UC2 — Scale rentable",      "active": false },
     { "label": "UC3 — Build-up/M&A",        "active": false },
     { "label": "UC4 — DNVB/omnicanal",      "active": false },
     { "label": "UC5 — Implantation France", "active": false },
@@ -101,16 +157,16 @@ Réponds UNIQUEMENT avec un bloc JSON valide, sans texte avant ni après :
   ],
   "eliminatoires": [
     { "status": "valid",   "title": "E1 — Position CODIR",           "proof": "preuve tirée du CV" },
-    { "status": "valid",   "title": "E2 — Expérience 10 ans+",       "proof": "durée et contexte" },
+    { "status": "valid",   "title": "E2 — Expérience ~10 ans+",      "proof": "durée et contexte" },
     { "status": "partial", "title": "E3 — Management de transition", "proof": "explication nuancée" },
     { "status": "invalid", "title": "E4 — Orientation business",     "proof": "ce qui manque" }
   ],
   "roleLabel": "DG",
   "roleCriteria": [
-    { "status": "valid",   "label": "critère 1", "note": "preuve tirée du CV" },
-    { "status": "partial", "label": "critère 2", "note": "présent / manquant" },
-    { "status": "invalid", "label": "critère 3", "note": "absent ou insuffisant" },
-    { "status": "valid",   "label": "critère 4", "note": "preuve" }
+    { "status": "valid",   "label": "critère spécifique 1 du rôle", "note": "preuve tirée du CV" },
+    { "status": "partial", "label": "critère spécifique 2 du rôle", "note": "présent / manquant" },
+    { "status": "invalid", "label": "critère spécifique 3 du rôle", "note": "absent ou insuffisant" },
+    { "status": "valid",   "label": "critère spécifique 4 du rôle", "note": "preuve" }
   ],
   "strengths": [
     "Point fort 1 — concret, chiffré si possible",
@@ -122,7 +178,7 @@ Réponds UNIQUEMENT avec un bloc JSON valide, sans texte avant ni après :
     "Gap 2"
   ],
   "recommendation": "Fort match",
-  "recommendationDetail": "Synthèse de 2-3 phrases sur la décision et les prochaines étapes."
+  "recommendationDetail": "Synthèse 2-3 phrases : décision, prochaines étapes, et signalement explicite de tout KPI ou périmètre absent du CV qui nécessiterait vérification."
 }
 \`\`\`
 
