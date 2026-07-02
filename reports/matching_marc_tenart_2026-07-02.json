@@ -1,0 +1,49 @@
+{
+  "name": "Marc Ténart",
+  "initials": "MT",
+  "title": "Dirigeant – Investisseur (ex-PDG Lapeyre)",
+  "employer": "Indépendant · depuis 2024",
+  "experience": "~32 ans d'expérience",
+  "analysisDate": "2 juillet 2026",
+  "score": 93,
+  "verdict": "fort",
+  "role": "Directeur Général (+ Finance & Juridique)",
+  "useCases": [
+    { "label": "UC1 — Retournement", "active": true },
+    { "label": "UC2 — Scale", "active": false },
+    { "label": "UC3 — Build-up/M&A", "active": true },
+    { "label": "UC4 — DNVB/omnicanal", "active": false },
+    { "label": "UC5 — Implantation France", "active": false },
+    { "label": "UC6 — Board/DG", "active": true }
+  ],
+  "eliminatoires": [
+    { "status": "valid", "title": "E1 — Position CODIR", "proof": "PDG Groupe Lapeyre & Conforama, DG Kingfisher France / Castorama, membre Comex" },
+    { "status": "valid", "title": "E2 — Expérience 10 ans+", "proof": "~32 ans de carrière, dont ~16 en direction générale / P&L" },
+    { "status": "valid", "title": "E3 — Management de transition", "proof": "Mandats de redressement enchaînés sous égide de fonds / groupe coté" },
+    { "status": "valid", "title": "E4 — Orientation business", "proof": "EBITDA rééquilibré 6 mois, BFR −500 M€, +100 M€ synergies, NPS +15 pts" }
+  ],
+  "roleLabel": "Directeur Général",
+  "roleCriteria": [
+    { "status": "valid", "label": "DG/CEO entité ≥ 20 M€ CA", "note": "20 M€ → 3,5 Mds€" },
+    { "status": "valid", "label": "Responsabilité P&L complet", "note": "PDG Groupe" },
+    { "status": "valid", "label": "≥ 1 cycle de transformation", "note": "Retournement + M&A" },
+    { "status": "valid", "label": "KPIs CA / EBITDA / FCF", "note": "Chiffrés partout" }
+  ],
+  "strengths": [
+    "Track record de retournement retail répété et prouvé (Conforama, Lapeyre, Brico Dépôt Espagne)",
+    "Double compétence rare DG + DAF haut niveau (BFR, cash 13 semaines, restructuring, PGE)",
+    "Expérience M&A / cession et interface directe fonds PE et conseils d'administration",
+    "Secteur retail / bricolage / habitat = cœur de cible Shyfters",
+    "Gouvernance sociale maîtrisée sur PSE de grande ampleur"
+  ],
+  "gaps": [
+    "Aucune appétence IA / data-driven explicite (différenciateur Shyfters)",
+    "Profil très « grands groupes » (> 500 M€) — transposition ETI/PME à valider",
+    "Pas de DNVB / e-commerce natif (UC4 seulement partiel)",
+    "Séquences courtes (~3 ans) — durée d'engagement à cadrer",
+    "Volet juridique = corporate/M&A, pas droit social"
+  ],
+  "recommendation": "Entretien — priorité haute",
+  "recommendationDetail": "Candidat premium à positionner en tête de vivier DG / retournement. À qualifier sur le mode d'intervention (mandat social / transition / board), l'appétence ETI/PME et le rapport à l'IA/data.",
+  "analysisFilename": "matching_marc_tenart_2026-07-02.md"
+}
