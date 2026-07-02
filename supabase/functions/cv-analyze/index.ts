@@ -38,8 +38,12 @@ function buildPrompt(cv_text: string, poste_vise: string | null, client_name: st
 Positionnement : "des dirigeants expérimentés, pas des consultants" — vision pragmatique fondée sur l'expérience terrain.
 Modèle de service : "CODIR as a Service" — 7 rôles de direction à matcher.
 
-⚠️ IMPORTANT : tu travailles uniquement sur le texte du CV fourni. Aucune recherche web n'est disponible dans ce contexte.
-Mentionne explicitement dans recommendationDetail si des informations clés (KPIs, périmètres) sont absentes du CV et nécessiteraient une vérification.
+⚠️ Tu as accès à un outil de recherche web. Utilise-le pour corroborer et enrichir l'analyse du CV, exactement comme le ferait un consultant Shyfters :
+- Recherche le profil LinkedIn du candidat pour vérifier le titre exact, le périmètre, la taille d'équipe/entreprise.
+- Recherche l'entreprise (Pappers, presse économique) pour objectiver un CA, un effectif, un contexte de marché quand le CV reste vague ou relatif ("2ème rang régional", "+30%"...).
+- Ne fais PAS de recherche superflue : 2-4 requêtes ciblées suffisent généralement (nom + entreprise sur LinkedIn, nom de l'entreprise sur Pappers/presse).
+- Si une recherche ne donne rien d'exploitable, n'invente rien : reste sur ce que le CV documente et signale le manque dans recommendationDetail.
+Mentionne explicitement dans recommendationDetail les informations trouvées par recherche web (et leur source) ainsi que tout élément clé (KPIs, périmètres) resté non vérifiable.
 
 ${roleSection}
 ${client_name ? `Client : ${client_name}` : ""}
@@ -57,8 +61,8 @@ E3 — Capacité d'intervention en management de transition / mandat social.
 E4 — ORIENTATION BUSINESS démontrée : les expériences passées doivent intégrer des notions de résultats et de performance d'entreprise (impact chiffré ou qualifié sur CA, marge, EBITDA, trésorerie, parts de marché, rentabilité, productivité…). Un CV purement descriptif des missions/responsabilités, sans lien explicite avec la performance, est éliminé — quel que soit le niveau hiérarchique atteint.
 
 ## CRITÈRES SPÉCIFIQUES PAR RÔLE
-Pour chaque rôle, les 4 labels `roleCriteria` à utiliser sont fixés ci-dessous (≤ 30 caractères chacun).
-La `note` doit rester courte (≤ 40 caractères) : preuve chiffrée tirée du CV, ou "Non mentionné", "À objectiver", "Absent du CV".
+Pour chaque rôle, les 4 labels \`roleCriteria\` à utiliser sont fixés ci-dessous (≤ 30 caractères chacun).
+La \`note\` doit rester courte (≤ 40 caractères) : preuve chiffrée tirée du CV, ou "Non mentionné", "À objectiver", "Absent du CV".
 
 1. Directeur Général — roleLabel: "DG"
    label[0]: "DG d'entité ≥ 20 M€"          → CA de l'entité dirigée
@@ -239,30 +243,53 @@ serve(async (req) => {
 
   let analysis: Record<string, unknown>;
   try {
-    const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "x-api-key":         ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-        "content-type":      "application/json",
-      },
-      body: JSON.stringify({
-        model:      "claude-sonnet-4-6",
-        max_tokens: 4096,
-        messages:   [{ role: "user", content: buildPrompt(cv_text, poste_vise, client_name, today) }],
-      }),
-    });
+    const messages: Array<{ role: string; content: unknown }> = [
+      { role: "user", content: buildPrompt(cv_text, poste_vise, client_name, today) },
+    ];
 
-    if (!claudeRes.ok) {
-      const txt = await claudeRes.text();
-      throw new Error(`Claude ${claudeRes.status}: ${txt}`);
+    let claudeData: { content: Array<{ type: string; text?: string }>; stop_reason?: string };
+    let iterations = 0;
+
+    while (true) {
+      const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "x-api-key":         ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
+          "content-type":      "application/json",
+        },
+        body: JSON.stringify({
+          model:      "claude-sonnet-4-6",
+          max_tokens: 8192,
+          tools:      [{ type: "web_search_20260209", name: "web_search", max_uses: 6 }],
+          messages,
+        }),
+      });
+
+      if (!claudeRes.ok) {
+        const txt = await claudeRes.text();
+        throw new Error(`Claude ${claudeRes.status}: ${txt}`);
+      }
+
+      claudeData = await claudeRes.json();
+
+      // La recherche web est un outil serveur : Claude boucle en interne (max 10
+      // itérations) puis renvoie stop_reason "pause_turn" s'il n'a pas terminé.
+      if (claudeData.stop_reason === "pause_turn" && ++iterations < 3) {
+        messages.push({ role: "assistant", content: claudeData.content });
+        continue;
+      }
+      break;
     }
 
-    const claudeData = await claudeRes.json();
     if (!Array.isArray(claudeData.content) || claudeData.content.length === 0) {
       throw new Error("Réponse Claude vide ou format inattendu");
     }
-    const rawText: string = claudeData.content[0].text ?? "";
+    const rawText = claudeData.content
+      .filter((b) => b.type === "text")
+      .map((b) => b.text ?? "")
+      .join("\n");
+    if (!rawText.trim()) throw new Error("Réponse Claude sans contenu textuel");
 
     const match =
       rawText.match(/```json\s*([\s\S]*?)\s*```/) ||
@@ -279,7 +306,7 @@ serve(async (req) => {
   const slug = String(analysis.name || "candidat")
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "_")
     .replace(/^_|_$/g, "");
   const dateStr = new Date().toISOString().split("T")[0];
@@ -295,7 +322,9 @@ serve(async (req) => {
       poste_vise:        String(analysis.role || ""),
       client:            client_name,
       score_global:      typeof analysis.score === "number" ? analysis.score : null,
-      recommandation:    String(analysis.verdict || "non-match"),
+      recommandation:    ["fort", "partiel", "non-match"].includes(String(analysis.verdict))
+                            ? String(analysis.verdict)
+                            : "non-match",
       synthese:          String(analysis.recommendationDetail || ""),
       detail_grille:     { ...analysis, analysisFilename: filename },
       analysis_filename: filename,

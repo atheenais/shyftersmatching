@@ -116,7 +116,7 @@
     <div class="list-header" style="margin-bottom:24px">
       <div>
         <div class="list-title">Analyser un CV</div>
-        <div class="list-meta">Importer un fichier PDF, Word ou texte — ou coller directement le CV</div>
+        <div class="list-meta">Importer un fichier PDF, Word ou texte — ou coller directement le CV. Claude enrichit l'analyse par recherche web (LinkedIn, presse).</div>
       </div>
     </div>
 
@@ -168,7 +168,7 @@
       <div class="spinner"></div>
       <div>
         <div class="progress-text" id="progressText">Analyse en cours…</div>
-        <div class="progress-sub">Claude analyse le CV selon la grille Shyfters CODIR</div>
+        <div class="progress-sub">Claude analyse le CV et effectue des recherches web selon la grille Shyfters CODIR</div>
       </div>
     </div>
 
@@ -340,6 +340,7 @@
     let stepIndex = 0;
     const steps = [
       'Envoi du CV à Claude…',
+      'Recherche web (LinkedIn, presse)…',
       'Analyse des critères éliminatoires…',
       'Évaluation de la grille CODIR…',
       'Calcul du score et du verdict…',
