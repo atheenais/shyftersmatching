@@ -1,0 +1,48 @@
+{
+  "name": "Emmanuel Bourgeois",
+  "initials": "EB",
+  "title": "Directeur Général — expertise crise & restructuring",
+  "employer": "Ducatillon Nature · Associé Shyfters",
+  "experience": "35+ ans d'expérience",
+  "analysisDate": "2 juillet 2026",
+  "score": 92,
+  "verdict": "fort",
+  "role": "Directeur Général (+ Marketing Digital)",
+  "useCases": [
+    { "label": "UC1 — Retournement", "active": true },
+    { "label": "UC2 — Scale", "active": false },
+    { "label": "UC3 — Build-up/M&A", "active": true },
+    { "label": "UC4 — DNVB/omnicanal", "active": false },
+    { "label": "UC5 — Implantation France", "active": false },
+    { "label": "UC6 — Board/DG", "active": true }
+  ],
+  "eliminatoires": [
+    { "status": "valid", "title": "E1 — Position CODIR", "proof": "DG mandat social Ducatillon, DG Printemps Lille/Metz, board member" },
+    { "status": "valid", "title": "E2 — Expérience 10 ans+", "proof": "35+ ans, majorité en direction générale ou de BU" },
+    { "status": "valid", "title": "E3 — Management de transition", "proof": "Président / DG avec mandat social, contexte procédures collectives" },
+    { "status": "valid", "title": "E4 — Orientation business", "proof": "EBITDA 2 M€, NPS 66, -50% coûts, retour à l'équilibre, +20% CA" }
+  ],
+  "roleLabel": "Directeur Général",
+  "roleCriteria": [
+    { "status": "valid", "label": "DG/CEO entité ≥ 20 M€", "note": "Ducatillon 28 M€" },
+    { "status": "valid", "label": "Responsabilité P&L complet", "note": "Mandat social" },
+    { "status": "valid", "label": "≥ 1 cycle de transformation", "note": "Retournement + M&A + scale" },
+    { "status": "partial", "label": "KPIs CA/EBITDA/FCF/valo", "note": "FCF/valo peu explicites" }
+  ],
+  "strengths": [
+    "Triple compétence rare : retournement (RJ, plan de cession) + M&A/LBO + croissance omnicanale",
+    "Ancrage retail / e-commerce / phygital nordiste parfaitement aligné sur la cible Shyfters",
+    "Track record chiffré et vérifiable publiquement (BODACC, presse spécialisée)",
+    "Appétence IA / transformation digitale démontrée (refonte SI, flux data par IA)",
+    "Réseau actionnaires, PE, family offices et gouvernance (board member)"
+  ],
+  "gaps": [
+    "International limité : anglais technique, zones France & Europe",
+    "KPIs de haut de bilan (FCF, dette nette, multiples) peu explicités",
+    "Trajectoire Ducatillon nuancée : liquidation de l'entité initiale avant reprise des actifs",
+    "Co-fondateur Shyfters : profil de référence, non staffable comme candidat externe"
+  ],
+  "recommendation": "Profil de référence / calibrage",
+  "recommendationDetail": "Co-fondateur du cabinet : étalon « Match fort DG » pour calibrer la grille sur les futurs profils du vivier. Si mission externe, cadrer international et KPIs de valorisation en entretien.",
+  "analysisFilename": "matching_emmanuel_bourgeois_2026-07-02.json"
+}
